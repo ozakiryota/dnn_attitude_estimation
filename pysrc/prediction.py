@@ -16,6 +16,9 @@ def prediction():
     rospy.Subscriber("/image_raw", Image, callback)
     rospy.spin()
 
+    ## device check
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("device = ", device)
     ## network
     use_pretrained = True
     net = models.vgg16(pretrained=use_pretrained)
