@@ -3,8 +3,11 @@
 import rospy
 from sensor_msgs.msg import Image
 
+import torch
+
 def callback(msg):
-    print(test)
+    # print("test")
+    a = 0
 
 def prediction():
     rospy.init_node('prediction', anonymous=True)
