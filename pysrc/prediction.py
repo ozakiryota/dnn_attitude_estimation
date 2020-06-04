@@ -4,6 +4,7 @@ import rospy
 from sensor_msgs.msg import Image
 
 def callback(msg):
+    print(test)
 
 def prediction():
     rospy.init_node('prediction', anonymous=True)
