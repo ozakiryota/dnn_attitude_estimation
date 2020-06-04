@@ -70,4 +70,4 @@ LABEL com.nvidia.volumes.needed="nvidia_driver"
 ENV PATH /usr/local/nvidia/bin:${PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 ######### initial position ##########
-WORKDIR /home/ros_catkin_ws
+WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation
