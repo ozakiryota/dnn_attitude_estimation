@@ -1,46 +1,46 @@
-FROM vistart/cuda:10.2-cudnn7-devel-ubuntu20.04
+FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu16.04
 
 ########## nvidia-docker1 hooks ##########
 LABEL com.nvidia.volumes.needed="nvidia_driver"
 ENV PATH /usr/local/nvidia/bin:${PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
-########## non-interactive ##########
+########## Non-interactive ##########
 ## Avoiding "Country of origin for the keyboard" 
-## in "apt-get install -y ros-noetic-desktop-full"
-ENV DEBIAN_FRONTEND=noninteractive
-########## time zone ##########
+## in "apt-get install -y ros-kinetic-desktop-full"
+# ENV DEBIAN_FRONTEND=noninteractive
+########## Time zone ##########
 ##### UTC #####
-RUN echo 'Etc/UTC' > /etc/timezone && \
-    ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
-	apt-get update && \
-	apt-get install -q -y --no-install-recommends tzdata && \
-	rm -rf /var/lib/apt/lists/*
+# RUN echo 'Etc/UTC' > /etc/timezone && \
+#     ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+# 	apt-get update && \
+# 	apt-get install -q -y --no-install-recommends tzdata && \
+# 	rm -rf /var/lib/apt/lists/*
 ##### Asia/Tokyo #####
 # RUN echo 'Asia/Tokyo' > /etc/timezone && \
 #     ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
 # 	apt-get update && \
 # 	apt-get install -q -y --no-install-recommends tzdata && \
 # 	rm -rf /var/lib/apt/lists/*
-########## basis ##########
+########## BASIS ##########
 RUN apt-get update && apt-get install -y \
 	vim \
 	wget \
 	unzip \
 	git \
 	cmake-curses-gui
-########## ROS Noetic insatall ##########
+########## ROS kinetic insatall ##########
 ## NOTE: "lsb_release" -> "lsb-release"
 RUN apt-get update && apt-get install -y lsb-release &&\
 	sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' &&\
-	apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 &&\
-	apt-get update && apt-get install -y ros-noetic-desktop-full
+	apt-key adv --keyserver 'hkp://ha.pool.sks-keyservers.net:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 &&\
+	apt-get update && apt-get install -y ros-kinetic-desktop-full
 ########## ROS setup ##########
 RUN mkdir -p /home/ros_catkin_ws/src && \
 	cd /home/ros_catkin_ws/src && \
-	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_init_workspace" && \
+	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin_init_workspace" && \
 	cd /home/ros_catkin_ws && \
-	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make" && \
-	echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && \
+	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin_make" && \
+	echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && \
 	echo "source /home/ros_catkin_ws/devel/setup.bash" >> ~/.bashrc && \
 	echo "export ROS_PACKAGE_PATH=\${ROS_PACKAGE_PATH}:/home/ros_catkin_ws" >> ~/.bashrc && \
 	echo "export ROS_WORKSPACE=/home/ros_catkin_ws" >> ~/.bashrc
@@ -48,7 +48,25 @@ RUN mkdir -p /home/ros_catkin_ws/src && \
 RUN echo "function cmk(){\n	lastpwd=\$OLDPWD \n	cpath=\$(pwd) \n	cd /home/ros_catkin_ws \n	catkin_make \$@ \n	cd \$cpath \n	OLDPWD=\$lastpwd \n}" >> ~/.bashrc
 ########## PyTorch ##########
 RUN apt-get update && apt-get install -y python3-pip &&\
-	pip3 install torch torchvision
+	pip3 install torch==1.0.0 torchvision==0.2.1
+# RUN apt-get update && apt-get install -y python3-pip &&\
+# 	pip3 install torch==1.2.0+cu92 torchvision==0.4.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html
+# RUN apt-get update && apt-get install -y python3-pip &&\
+# 	pip3 install torch===1.2.0 torchvision===0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
+########## Python3 on rospy ##########
+RUN apt-get update && apt-get install -y python3-pip python3-yaml &&\
+	pip3 install rospkg catkin_pkg
+########## vision_opencv ##########
+RUN apt-get update && apt-get install -y python-catkin-tools python3-dev python3-numpy &&\
+	mkdir /home/catkin_build_ws && cd /home/catkin_build_ws &&\
+	catkin config -DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.5m -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.5m.so &&\
+	catkin config --install &&\
+	mkdir src && cd src &&\
+	git clone -b kinetic https://github.com/ros-perception/vision_opencv.git &&\
+	cd /home/catkin_build_ws &&\
+	ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python3.so &&\
+	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin build cv_bridge" &&\
+	/bin/bash -c " source install/setup.bash --extend"
 ########## NO cache ##########
 ARG CACHEBUST=1
 ########## dnn_attitude_estimation ##########
@@ -56,8 +74,8 @@ ARG CACHEBUST=1
 RUN	cd /home/ros_catkin_ws/src && \
 	git clone https://github.com/ozakiryota/dnn_attitude_estimation &&\
 	cd /home/ros_catkin_ws && \
-	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make"
-##### authorize #####
+	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin_make"
+##### Authorize #####
 RUN	chmod +x /home/ros_catkin_ws/src/dnn_attitude_estimation/pysrc/prediction.py
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation
