@@ -14,7 +14,6 @@ def callback(msg):
 def prediction():
     rospy.init_node('prediction', anonymous=True)
     rospy.Subscriber("/image_raw", Image, callback)
-    rospy.spin()
 
     ## device check
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -30,6 +29,8 @@ def prediction():
         nn.Linear(in_features=18, out_features=3, bias=True)
     )
     print(net)
+
+    rospy.spin()
 
 if __name__ == '__main__':
     prediction()
