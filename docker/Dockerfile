@@ -1,4 +1,3 @@
-# FROM vistart/cuda:10.2-cudnn7-runtime-ubuntu20.04
 FROM vistart/cuda:10.2-cudnn7-devel-ubuntu20.04
 
 ########## nvidia-docker1 hooks ##########
