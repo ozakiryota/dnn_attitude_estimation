@@ -31,7 +31,5 @@ def prediction():
     )
     print(net)
 
-net.eval()
-
 if __name__ == '__main__':
     prediction()
