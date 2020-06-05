@@ -3,13 +3,18 @@
 import rospy
 from sensor_msgs.msg import Image
 
+from cv_bridge import CvBridge, CvBridgeError
+
 import torch
 from torchvision import models
 import torch.nn as nn
 
 def callback(msg):
-    # print("test")
-    a = 0
+    bridge = CvBridge()
+    try:
+        cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
+    except CvBridgeError as e:
+        print(e)
 
 def prediction():
     rospy.init_node('prediction', anonymous=True)
