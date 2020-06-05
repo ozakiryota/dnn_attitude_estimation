@@ -12,7 +12,8 @@ import torch.nn as nn
 def callback(msg):
     bridge = CvBridge()
     try:
-        cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
+        cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
+        print("cv_image.shape = ", cv_image.shape)
     except CvBridgeError as e:
         print(e)
 
