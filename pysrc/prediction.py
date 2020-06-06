@@ -5,6 +5,9 @@ from sensor_msgs.msg import Image
 
 from cv_bridge import CvBridge, CvBridgeError
 
+import cv2
+from PIL import Image
+
 import torch
 from torchvision import models
 import torch.nn as nn
@@ -12,7 +15,7 @@ from torchvision import transforms
 
 class GravityPrediction:
     def __init__(self, net, size, mean, std):
-        rospy.Subscriber("/image_raw", Image, self.callback)
+        self.sub = rospy.Subscriber("/image_raw", Image, self.callback)
         self.bridge = CvBridge()
         self.img_transform = transforms.Compose([
             transforms.Resize(size),
@@ -21,14 +24,19 @@ class GravityPrediction:
             transforms.Normalize(mean, std)
         ])
 
-    def callback(msg):
+    def callback(self, msg):
         try:
-            cv_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            print("cv_img.shape = ", cv_img.shape)
-            tensor_img = torch.from_numpy(cv_img.transpose((2, 1, 0)))
-            inputs = self.img_transform(cv_img)
+            img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            print("img_cv.shape = ", img_cv.shape)
+            img_pil = self.cv_to_pil(img_cv)
+            inputs = self.img_transform(img_pil)
         except CvBridgeError as e:
             print(e)
+
+    def cv_to_pil(self, img_cv):
+        img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+        img_pil = Image.fromarray(img_cv)
+        return img_pil
 
 def main():
     rospy.init_node('gravity_prediction', anonymous=True)
