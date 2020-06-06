@@ -45,16 +45,10 @@ RUN mkdir -p /home/ros_catkin_ws/src && \
 	echo "export ROS_PACKAGE_PATH=\${ROS_PACKAGE_PATH}:/home/ros_catkin_ws" >> ~/.bashrc && \
 	echo "export ROS_WORKSPACE=/home/ros_catkin_ws" >> ~/.bashrc
 ## cmk
-RUN echo "function cmk(){\n	lastpwd=\$OLDPWD \n	cpath=\$(pwd) \n	cd /home/ros_catkin_ws \n	catkin_make \$@ \n	cd \$cpath \n	OLDPWD=\$lastpwd \n}" >> ~/.bashrc
+RUN echo "function cmk(){\n lastpwd=\$OLDPWD \n cpath=\$(pwd) \n cd /home/ros_catkin_ws \n catkin_make \$@ \n cd \$cpath \n OLDPWD=\$lastpwd \n}" >> ~/.bashrc
 ########## PyTorch ##########
 RUN apt-get update && apt-get install -y python3-pip &&\
 	pip3 install torch==1.0.0 torchvision==0.2.1
-# RUN apt-get update && apt-get install -y python3-pip &&\
-# 	pip3 install torch==1.2.0+cu92 torchvision==0.4.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html
-# RUN apt-get update && apt-get install -y python3-pip &&\
-# 	pip3 install torch===1.2.0 torchvision===0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
-########## Python ##########
-RUN apt-get update && apt-get install -y libopencv
 ########## Python3 on rospy ##########
 RUN apt-get update && apt-get install -y python3-pip &&\
 	pip3 install rospkg catkin_pkg
@@ -68,7 +62,19 @@ RUN apt-get update && apt-get install -y python-catkin-tools python3-dev python3
 	cd /home/catkin_build_ws &&\
 	ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python3.so &&\
 	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin build cv_bridge" &&\
-	/bin/bash -c " source install/setup.bash --extend"
+	/bin/bash -c "source install/setup.bash --extend"
+# RUN apt-get update && apt-get install -y python-catkin-tools python3-dev python3-catkin-pkg-modules python3-numpy python3-yaml ros-kinetic-cv-bridge &&\
+# 	mkdir /home/catkin_build_ws && cd /home/catkin_build_ws &&\
+# 	catkin init &&\
+# 	catkin config -DPYTHON_EXECUTABLE=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3.5m -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.5m.so &&\
+# 	catkin config --install &&\
+# 	mkdir src && cd src &&\
+# 	git clone -b kinetic https://github.com/ros-perception/vision_opencv.git &&\
+# 	cd /home/catkin_build_ws &&\
+# 	ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python3.so &&\
+# 	/bin/bash -c "source /opt/ros/kinetic/setup.bash; catkin build cv_bridge" &&\
+# 	/bin/bash -c "source install/setup.bash --extend"
+RUN echo "source /home/catkin_build_ws/install/setup.bash --extend" >> ~/.bashrc
 ########## NO cache ##########
 ARG CACHEBUST=1
 ########## dnn_attitude_estimation ##########
