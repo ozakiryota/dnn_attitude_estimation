@@ -25,16 +25,16 @@ def prediction():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device = ", device)
     ## network
-    # use_pretrained = True
-    # net = models.vgg16(pretrained=use_pretrained)
-    # net.features[26] = nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(0, 0))
-    # net.features = nn.Sequential(*list(net.features.children())[:-3])
-    # net.classifier = nn.Sequential(
-    #     nn.Linear(in_features=73728, out_features=18, bias=True),
-    #     nn.ReLU(True),
-    #     nn.Linear(in_features=18, out_features=3, bias=True)
-    # )
-    # print(net)
+    use_pretrained = True
+    net = models.vgg16(pretrained=use_pretrained)
+    net.features[26] = nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(0, 0))
+    net.features = nn.Sequential(*list(net.features.children())[:-3])
+    net.classifier = nn.Sequential(
+        nn.Linear(in_features=73728, out_features=18, bias=True),
+        nn.ReLU(True),
+        nn.Linear(in_features=18, out_features=3, bias=True)
+    )
+    print(net)
 
     bridge = CvBridge()
 
