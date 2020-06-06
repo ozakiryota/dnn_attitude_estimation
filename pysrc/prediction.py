@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image as ImageMsg
 
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -15,7 +15,7 @@ from torchvision import transforms
 
 class GravityPrediction:
     def __init__(self, net, size, mean, std):
-        self.sub = rospy.Subscriber("/image_raw", Image, self.callback)
+        self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
         self.bridge = CvBridge()
         self.img_transform = transforms.Compose([
             transforms.Resize(size),
@@ -29,7 +29,10 @@ class GravityPrediction:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
             img_pil = self.cv_to_pil(img_cv)
-            inputs = self.img_transform(img_pil)
+            img_transformed = self.img_transform(img_pil)
+            inputs = img_transformed.unsqueeze_(0)
+            outputs = net(inputs)
+            print("outputs = ", outputs)
         except CvBridgeError as e:
             print(e)
 
