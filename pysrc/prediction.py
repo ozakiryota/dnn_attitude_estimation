@@ -17,6 +17,7 @@ class GravityPrediction:
     def __init__(self, net, size, mean, std):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
         self.bridge = CvBridge()
+        self.net = net
         self.img_transform = transforms.Compose([
             transforms.Resize(size),
             transforms.CenterCrop(size),
@@ -31,7 +32,7 @@ class GravityPrediction:
             img_pil = self.cv_to_pil(img_cv)
             img_transformed = self.img_transform(img_pil)
             inputs = img_transformed.unsqueeze_(0)
-            outputs = net(inputs)
+            outputs = self.net(inputs)
             print("outputs = ", outputs)
         except CvBridgeError as e:
             print(e)
