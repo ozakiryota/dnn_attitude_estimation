@@ -36,6 +36,8 @@ def prediction():
     )
     print(net)
 
+    bridge = CvBridge()
+
     rospy.spin()
 
 if __name__ == '__main__':

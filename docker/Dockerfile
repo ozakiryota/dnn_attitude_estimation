@@ -53,8 +53,10 @@ RUN apt-get update && apt-get install -y python3-pip &&\
 # 	pip3 install torch==1.2.0+cu92 torchvision==0.4.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html
 # RUN apt-get update && apt-get install -y python3-pip &&\
 # 	pip3 install torch===1.2.0 torchvision===0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
+########## Python ##########
+RUN apt-get update && apt-get install -y libopencv
 ########## Python3 on rospy ##########
-RUN apt-get update && apt-get install -y python3-pip python3-yaml &&\
+RUN apt-get update && apt-get install -y python3-pip &&\
 	pip3 install rospkg catkin_pkg
 ########## vision_opencv ##########
 RUN apt-get update && apt-get install -y python-catkin-tools python3-dev python3-numpy &&\
