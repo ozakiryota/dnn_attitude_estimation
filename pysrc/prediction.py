@@ -14,7 +14,7 @@ import torch.nn as nn
 from torchvision import transforms
 
 class GravityPrediction:
-    def __init__(self, net, size, mean, std):
+    def __init__(self, size, mean, std, net):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
         self.bridge = CvBridge()
         self.net = net
@@ -43,12 +43,21 @@ class GravityPrediction:
         return img_pil
 
 def main():
+    ## Node
     rospy.init_node('gravity_prediction', anonymous=True)
+    ## Param
+    weights_path = rospy.get_param("weights_path", "weights.pth")
+    print("weights_path = ", weights_path)
 
-    ## device check
+    ## Device check
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device = ", device)
-    ## network
+    print("torch.cuda.current_device() = ", torch.cuda.current_device())
+    ## size, mean, std
+    size = 224  #VGG16
+    mean = ([0.5, 0.5, 0.5])
+    std = ([0.25, 0.25, 0.25])
+    ## Network
     net = models.vgg16()
     net.features[26] = nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(0, 0))
     net.features = nn.Sequential(*list(net.features.children())[:-3])
@@ -58,12 +67,17 @@ def main():
         nn.Linear(in_features=18, out_features=3, bias=True)
     )
     print(net)
-    ## size, mean, std
-    size = 224  #VGG16
-    mean = ([0.5, 0.5, 0.5])
-    std = ([0.25, 0.25, 0.25])
+    ## Load weights
+    was_saved_in_same_device = False
+    if was_saved_in_same_device:
+        ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
+        load_weights = torch.load(weights_path)
+    else:
+        ## saved in GPU -> load in CPU
+        load_weights = torch.load(weights_path, map_location={"cuda:0": "cpu"})
+    net.load_state_dict(load_weights)
 
-    gravity_prediction = GravityPrediction(net, size, mean, std)
+    gravity_prediction = GravityPrediction(size, mean, std, net)
 
     rospy.spin()
 

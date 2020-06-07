@@ -2,6 +2,6 @@
 	<!-- main -->
 	<node pkg="dnn_attitude_estimation" name="prediction" type="prediction.py" output="screen">
 		<remap from="/image_raw" to="/decompressed_image"/>
-		<!-- <param name="save_dir_path" type="string" value="$(find save_dataset)/dataset/train"/> -->
+		<param name="weights_path" type="string" value="$(find dnn_attitude_estimation)/weights.pth"/>
 	</node>
 </launch>
