@@ -76,6 +76,8 @@ def main():
         ## saved in GPU -> load in CPU
         load_weights = torch.load(weights_path, map_location={"cuda:0": "cpu"})
     net.load_state_dict(load_weights)
+    ## set as eval
+    net.eval()
 
     gravity_prediction = GravityPrediction(size, mean, std, net)
 
