@@ -2,6 +2,8 @@
 
 import rospy
 from sensor_msgs.msg import Image as ImageMsg
+from geometry_msgs import QuaternionStamped
+import tf
 
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -17,6 +19,7 @@ from torchvision import transforms
 class AttitudeEstimation:
     def __init__(self, device, size, mean, std, net):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
+        self.pub = rospy.Publisher("/dnn_attitude", QuaternionStamped, queue_size=1)
         self.bridge = CvBridge()
         self.device = device
         self.img_transform = transforms.Compose([
@@ -33,7 +36,9 @@ class AttitudeEstimation:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
             acc = self.dnn_prediction(img_cv)
-            self.acc_to_attitude(acc)
+            q_msg = self.acc_to_attitude(acc)
+            q_msg.header.stamp = msg.header.stamp
+            self.publication(q_msg)
         except CvBridgeError as e:
             print(e)
 
@@ -58,6 +63,16 @@ class AttitudeEstimation:
         p = math.atan2(-acc[0], acc[1] * math.sin(r) + acc[2] * math.cos(r))
         y = 0
         print("r = ", r, ", p = ", p)
+        q_tf = tf.transformations.quaternion_from_eular(r, p, y)
+        q_msg = QuaternionStamped()
+        q_msg.x = q_tf[0]
+        q_msg.y = q_tf[1]
+        q_msg.z = q_tf[2]
+        q_msg.w = q_tf[0]
+        return q_msg
+
+    def publication(self, q_msg):
+        self.pub.publish(q_msg)
 
 def main():
     ## Node
