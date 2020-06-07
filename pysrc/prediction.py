@@ -13,7 +13,7 @@ from torchvision import models
 import torch.nn as nn
 from torchvision import transforms
 
-class GravityPrediction:
+class AttitudeEstimation:
     def __init__(self, device, size, mean, std, net):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
         self.bridge = CvBridge()
@@ -30,11 +30,12 @@ class GravityPrediction:
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
-            acc = self.prediction(img_cv)
+            acc = self.dnn_prediction(img_cv)
+            self.acc_to_attitude(acc)
         except CvBridgeError as e:
             print(e)
 
-    def prediction(self, img_cv):
+    def dnn_prediction(self, img_cv):
             img_pil = self.cv_to_pil(img_cv)
             img_transformed = self.img_transform(img_pil)
             inputs = img_transformed.unsqueeze_(0)
@@ -49,12 +50,16 @@ class GravityPrediction:
         return img_pil
 
     def acc_to_attitude(self, acc):
-        acc = acc.numpy()
-        print("acc")
+        acc = acc.detach().numpy()
+        print(acc)
+        r = math.atan2(acc[1], acc[2])
+        p = math.atan2(-acc[0], acc[1] * math.sin(r) + acc[2] * math.cos(r))
+        y = 0
+        print("r = ", r, ", p = ", p)
 
 def main():
     ## Node
-    rospy.init_node('gravity_prediction', anonymous=True)
+    rospy.init_node('attitude_estimation', anonymous=True)
     ## Param
     weights_path = rospy.get_param("/weights_path", "weights.pth")
     print("weights_path = ", weights_path)
@@ -91,7 +96,7 @@ def main():
     ## set as eval
     net.eval()
 
-    gravity_prediction = GravityPrediction(device, size, mean, std, net)
+    attitude_estimation = AttitudeEstimation(device, size, mean, std, net)
 
     rospy.spin()
 
