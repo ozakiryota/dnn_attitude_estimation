@@ -7,6 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 import cv2
 from PIL import Image
+import math
 
 import torch
 from torchvision import models
@@ -27,6 +28,7 @@ class AttitudeEstimation:
         self.net = net
 
     def callback(self, msg):
+        print("----------")
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
@@ -50,7 +52,7 @@ class AttitudeEstimation:
         return img_pil
 
     def acc_to_attitude(self, acc):
-        acc = acc.detach().numpy()
+        acc = acc[0].detach().numpy()
         print(acc)
         r = math.atan2(acc[1], acc[2])
         p = math.atan2(-acc[0], acc[1] * math.sin(r) + acc[2] * math.cos(r))
