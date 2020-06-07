@@ -32,6 +32,7 @@ class AttitudeEstimation:
 
     def callback(self, msg):
         print("----------")
+        start_clock = rospy.Time.now()
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
@@ -41,6 +42,7 @@ class AttitudeEstimation:
             self.publication(q_msg)
         except CvBridgeError as e:
             print(e)
+        print("Period [s]: ", (rospy.Time.now() - start_clock).secs)
 
     def dnn_prediction(self, img_cv):
             img_pil = self.cv_to_pil(img_cv)
