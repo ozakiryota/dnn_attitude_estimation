@@ -46,7 +46,7 @@ def main():
     ## Node
     rospy.init_node('gravity_prediction', anonymous=True)
     ## Param
-    weights_path = rospy.get_param("weights_path", "weights.pth")
+    weights_path = rospy.get_param("/weights_path", "weights.pth")
     print("weights_path = ", weights_path)
 
     ## Device check
