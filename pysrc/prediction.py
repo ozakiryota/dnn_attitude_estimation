@@ -52,7 +52,7 @@ def main():
     ## Device check
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device = ", device)
-    print("torch.cuda.current_device() = ", torch.cuda.current_device())
+    # print("torch.cuda.current_device() = ", torch.cuda.current_device())
     ## size, mean, std
     size = 224  #VGG16
     mean = ([0.5, 0.5, 0.5])

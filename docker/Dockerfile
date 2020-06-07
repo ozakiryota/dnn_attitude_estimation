@@ -47,8 +47,12 @@ RUN mkdir -p /home/ros_catkin_ws/src && \
 ## cmk
 RUN echo "function cmk(){\n	lastpwd=\$OLDPWD \n	cpath=\$(pwd) \n cd /home/ros_catkin_ws \n catkin_make \$@ \n cd \$cpath \n	OLDPWD=\$lastpwd \n}" >> ~/.bashrc
 ########## PyTorch ##########
+# RUN apt-get update && apt-get install -y python3-pip &&\
+# 	pip3 install torch torchvision
 RUN apt-get update && apt-get install -y python3-pip &&\
-	pip3 install torch torchvision
+	pip3 install \
+		https://download.pytorch.org/whl/cu102/torch-1.5.0-cp38-cp38-linux_x86_64.whl \
+		https://download.pytorch.org/whl/cu102/torchvision-0.6.0-cp38-cp38-linux_x86_64.whl
 ########## NO cache ##########
 ARG CACHEBUST=1
 ########## dnn_attitude_estimation ##########
