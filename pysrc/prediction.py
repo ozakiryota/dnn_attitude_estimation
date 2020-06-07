@@ -29,18 +29,27 @@ class GravityPrediction:
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
+            acc = self.prediction(img_cv)
+        except CvBridgeError as e:
+            print(e)
+
+    def prediction(self, img_cv):
             img_pil = self.cv_to_pil(img_cv)
             img_transformed = self.img_transform(img_pil)
             inputs = img_transformed.unsqueeze_(0)
+            inputs = inputs.to(device)
             outputs = self.net(inputs)
             print("outputs = ", outputs)
-        except CvBridgeError as e:
-            print(e)
+            return outputs
 
     def cv_to_pil(self, img_cv):
         img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
         img_pil = Image.fromarray(img_cv)
         return img_pil
+
+    def acc_to_attitude(self, acc):
+        acc = acc.numpy()
+        print("acc")
 
 def main():
     ## Node
@@ -68,6 +77,7 @@ def main():
         nn.Linear(in_features=18, out_features=3, bias=True)
     )
     print(net)
+    net.to(device)
     ## Load weights
     was_saved_in_same_device = False
     if was_saved_in_same_device:
