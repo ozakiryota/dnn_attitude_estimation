@@ -72,6 +72,7 @@ class AttitudeEstimation:
         return q_msg
 
     def publication(self, q_msg):
+        q_msg.header.frame_id = "/base_link"
         self.pub.publish(q_msg)
 
 def main():
