@@ -14,16 +14,17 @@ import torch.nn as nn
 from torchvision import transforms
 
 class GravityPrediction:
-    def __init__(self, size, mean, std, net):
+    def __init__(self, device, size, mean, std, net):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
         self.bridge = CvBridge()
-        self.net = net
+        self.device = device
         self.img_transform = transforms.Compose([
             transforms.Resize(size),
             transforms.CenterCrop(size),
             transforms.ToTensor(),
             transforms.Normalize(mean, std)
         ])
+        self.net = net
 
     def callback(self, msg):
         try:
@@ -37,7 +38,7 @@ class GravityPrediction:
             img_pil = self.cv_to_pil(img_cv)
             img_transformed = self.img_transform(img_pil)
             inputs = img_transformed.unsqueeze_(0)
-            inputs = inputs.to(device)
+            inputs = inputs.to(self.device)
             outputs = self.net(inputs)
             print("outputs = ", outputs)
             return outputs
@@ -90,7 +91,7 @@ def main():
     ## set as eval
     net.eval()
 
-    gravity_prediction = GravityPrediction(size, mean, std, net)
+    gravity_prediction = GravityPrediction(device, size, mean, std, net)
 
     rospy.spin()
 
