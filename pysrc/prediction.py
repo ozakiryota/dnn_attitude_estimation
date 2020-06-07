@@ -2,8 +2,8 @@
 
 import rospy
 from sensor_msgs.msg import Image as ImageMsg
-from geometry_msgs import QuaternionStamped
-import tf
+from geometry_msgs.msg import QuaternionStamped
+from tf.transformations import quaternion_from_euler
 
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -63,12 +63,12 @@ class AttitudeEstimation:
         p = math.atan2(-acc[0], acc[1] * math.sin(r) + acc[2] * math.cos(r))
         y = 0
         print("r = ", r, ", p = ", p)
-        q_tf = tf.transformations.quaternion_from_eular(r, p, y)
+        q_tf = quaternion_from_euler(r, p, y)
         q_msg = QuaternionStamped()
-        q_msg.x = q_tf[0]
-        q_msg.y = q_tf[1]
-        q_msg.z = q_tf[2]
-        q_msg.w = q_tf[0]
+        q_msg.quaternion.x = q_tf[0]
+        q_msg.quaternion.y = q_tf[1]
+        q_msg.quaternion.z = q_tf[2]
+        q_msg.quaternion.w = q_tf[3]
         return q_msg
 
     def publication(self, q_msg):
