@@ -65,9 +65,9 @@ class AttitudeEstimation:
     def acc_tensor_to_msg(self, tensor):
         v = tensor[0].detach().numpy()
         msg = Vector3Stamped()
-        msg.vector.x = v[0]
-        msg.vector.y = v[1]
-        msg.vector.z = v[2]
+        msg.vector.x = -v[0]
+        msg.vector.y = -v[1]
+        msg.vector.z = -v[2]
         return msg
 
     def acc_to_attitude(self, acc):
