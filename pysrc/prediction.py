@@ -2,6 +2,7 @@
 
 import rospy
 from sensor_msgs.msg import Image as ImageMsg
+from geometry_msgs.msg import Vector3Stamped
 from geometry_msgs.msg import QuaternionStamped
 from tf.transformations import quaternion_from_euler
 
@@ -19,7 +20,8 @@ from torchvision import transforms
 class AttitudeEstimation:
     def __init__(self, device, size, mean, std, net):
         self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
-        self.pub = rospy.Publisher("/dnn_attitude", QuaternionStamped, queue_size=1)
+        self.pub_q = rospy.Publisher("/dnn_attitude", QuaternionStamped, queue_size=1)
+        self.pub_v = rospy.Publisher("/camera_g", Vector3Stamped, queue_size=1)
         self.bridge = CvBridge()
         self.device = device
         self.img_transform = transforms.Compose([
@@ -37,9 +39,11 @@ class AttitudeEstimation:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
             acc = self.dnn_prediction(img_cv)
+            v_msg = self.acc_tensor_to_msg(acc)
             q_msg = self.acc_to_attitude(acc)
+            v_msg.header.stamp = msg.header.stamp
             q_msg.header.stamp = msg.header.stamp
-            self.publication(q_msg)
+            self.publication(v_msg, q_msg)
         except CvBridgeError as e:
             print(e)
         print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
@@ -58,6 +62,14 @@ class AttitudeEstimation:
         img_pil = Image.fromarray(img_cv)
         return img_pil
 
+    def acc_tensor_to_msg(self, tensor):
+        v = tensor[0].detach().numpy()
+        msg = Vector3Stamped()
+        msg.vector.x = v[0]
+        msg.vector.y = v[1]
+        msg.vector.z = v[2]
+        return msg
+
     def acc_to_attitude(self, acc):
         acc = acc[0].detach().numpy()
         print(acc)
@@ -73,9 +85,11 @@ class AttitudeEstimation:
         q_msg.quaternion.w = q_tf[3]
         return q_msg
 
-    def publication(self, q_msg):
+    def publication(self, v_msg, q_msg):
+        v_msg.header.frame_id = "/base_link"
+        self.pub_v.publish(v_msg)
         q_msg.header.frame_id = "/base_link"
-        self.pub.publish(q_msg)
+        self.pub_q.publish(q_msg)
 
 def main():
     ## Node

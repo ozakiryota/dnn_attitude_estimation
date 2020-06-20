@@ -5,6 +5,9 @@
 	<!-- rosbag -->
 	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/infant/mocap/0113_infant/2019-01-13-15-46-58.bag -s 60"/>
 
+	<!-- sensor driver -->
+	<include file="$(find velodyne_pointcloud)/launch/32e_points.launch"/>
+
 	<!-- semi sensor driver -->
 	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">
 		<remap from="in" to="/camera/color/image_raw"/>
