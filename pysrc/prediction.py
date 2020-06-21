@@ -25,8 +25,8 @@ class AttitudeEstimation:
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
         self.pub_quat = rospy.Publisher("/dnn/attitude", QuaternionStamped, queue_size=1)
         ## msg
-        v_msg = Vector3Stamped()
-        q_msg = QuaternionStamped()
+        self.v_msg = Vector3Stamped()
+        self.q_msg = QuaternionStamped()
         ## cv_bridge
         self.bridge = CvBridge()
         ## copy arguments
@@ -72,9 +72,9 @@ class AttitudeEstimation:
         acc = acc[0].detach().numpy()
         print(acc)
         ## Vector3Stamped
-        self.v_msg.vector.x = -v[0]
-        self.v_msg.vector.y = -v[1]
-        self.v_msg.vector.z = -v[2]
+        self.v_msg.vector.x = -acc[0]
+        self.v_msg.vector.y = -acc[1]
+        self.v_msg.vector.z = -acc[2]
         ## QuaternionStamped
         r = math.atan2(acc[1], acc[2])
         p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
