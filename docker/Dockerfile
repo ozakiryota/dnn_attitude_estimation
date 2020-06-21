@@ -63,5 +63,8 @@ RUN	cd /home/ros_catkin_ws/src && \
 	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make"
 ##### Authorize #####
 RUN	chmod +x /home/ros_catkin_ws/src/dnn_attitude_estimation/pysrc/prediction.py
+##### script #####
+RUN echo "#!/bin/bash \n source /opt/ros/noetic/setup.bash; source /home/ros_catkin_ws/devel/setup.bash; roslaunch dnn_attitude_estimation prediction.launch" >> /home/launch.sh &&\
+	chmod +x /home/launch.sh
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation
