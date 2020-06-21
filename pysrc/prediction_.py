@@ -18,19 +18,11 @@ import torch.nn as nn
 from torchvision import transforms
 
 class AttitudeEstimation:
-    def __init__(self, frame_id, device, size, mean, std, net):
-        ## subscriber
-        self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage)
-        ## publisher
-        self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
-        self.pub_quat = rospy.Publisher("/dnn/attitude", QuaternionStamped, queue_size=1)
-        ## msg
-        v_msg = Vector3Stamped()
-        q_msg = QuaternionStamped()
-        ## cv_bridge
+    def __init__(self, device, size, mean, std, net):
+        self.sub = rospy.Subscriber("/image_raw", ImageMsg, self.callback)
+        self.pub_q = rospy.Publisher("/dnn_attitude", QuaternionStamped, queue_size=1)
+        self.pub_v = rospy.Publisher("/camera_g", Vector3Stamped, queue_size=1)
         self.bridge = CvBridge()
-        ## copy arguments
-        self.frame_id = frame_id
         self.device = device
         self.img_transform = transforms.Compose([
             transforms.Resize(size),
@@ -40,61 +32,64 @@ class AttitudeEstimation:
         ])
         self.net = net
 
-    def callbackImage(self, msg):
+    def callback(self, msg):
         print("----------")
         start_clock = rospy.get_time()
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
-            acc = self.dnnPrediction(img_cv)
-            self.inputToMsg(acc)
-            self.publication(msg.header.stamp)
+            acc = self.dnn_prediction(img_cv)
+            v_msg = self.acc_tensor_to_msg(acc)
+            q_msg = self.acc_to_attitude(acc)
+            v_msg.header.stamp = msg.header.stamp
+            q_msg.header.stamp = msg.header.stamp
+            self.publication(v_msg, q_msg)
         except CvBridgeError as e:
             print(e)
         print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
 
-    def dnnPrediction(self, img_cv):
-        img_pil = self.cvToPIL(img_cv)
-        img_transformed = self.img_transform(img_pil)
-        inputs = img_transformed.unsqueeze_(0)
-        inputs = inputs.to(self.device)
-        outputs = self.net(inputs)
-        print("outputs = ", outputs)
-        return outputs
+    def dnn_prediction(self, img_cv):
+            img_pil = self.cv_to_pil(img_cv)
+            img_transformed = self.img_transform(img_pil)
+            inputs = img_transformed.unsqueeze_(0)
+            inputs = inputs.to(self.device)
+            outputs = self.net(inputs)
+            print("outputs = ", outputs)
+            return outputs
 
-    def cvToPIL(self, img_cv):
+    def cv_to_pil(self, img_cv):
         img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
         img_pil = Image.fromarray(img_cv)
         return img_pil
 
-    def inputToMsg(self, acc):
-        ## tensor to numpy
+    def acc_tensor_to_msg(self, tensor):
+        v = tensor[0].detach().numpy()
+        msg = Vector3Stamped()
+        msg.vector.x = -v[0]
+        msg.vector.y = -v[1]
+        msg.vector.z = -v[2]
+        return msg
+
+    def acc_to_attitude(self, acc):
         acc = acc[0].detach().numpy()
         print(acc)
-        ## Vector3Stamped
-        self.v_msg.vector.x = -v[0]
-        self.v_msg.vector.y = -v[1]
-        self.v_msg.vector.z = -v[2]
-        ## QuaternionStamped
         r = math.atan2(acc[1], acc[2])
-        p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
-        y = 0.0
+        p = math.atan2(-acc[0], acc[1] * math.sin(r) + acc[2] * math.cos(r))
+        y = 0
         print("r = ", r, ", p = ", p)
         q_tf = quaternion_from_euler(r, p, y)
-        self.q_msg.quaternion.x = q_tf[0]
-        self.q_msg.quaternion.y = q_tf[1]
-        self.q_msg.quaternion.z = q_tf[2]
-        self.q_msg.quaternion.w = q_tf[3]
+        q_msg = QuaternionStamped()
+        q_msg.quaternion.x = q_tf[0]
+        q_msg.quaternion.y = q_tf[1]
+        q_msg.quaternion.z = q_tf[2]
+        q_msg.quaternion.w = q_tf[3]
+        return q_msg
 
-    def publication(self, stamp):
-        ## Vector3Stamped
-        self.v_msg.header.stamp = stamp
-        self.v_msg.header.frame_id = self.frame_id
-        self.pub_vector.publish(self.v_msg)
-        ## QuaternionStamped
-        self.q_msg.header.stamp = stamp
-        self.q_msg.header.frame_id = self.frame_id
-        self.pub_quat.publish(self.q_msg)
+    def publication(self, v_msg, q_msg):
+        v_msg.header.frame_id = "/base_link"
+        self.pub_v.publish(v_msg)
+        q_msg.header.frame_id = "/base_link"
+        self.pub_q.publish(q_msg)
 
 def main():
     ## Node
@@ -102,8 +97,6 @@ def main():
     ## Param
     weights_path = rospy.get_param("/weights_path", "weights.pth")
     print("weights_path = ", weights_path)
-    frame_id = rospy.get_param("/frame_id", "/base_link")
-    print("frame_id = ", frame_id)
 
     ## Device check
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -126,8 +119,8 @@ def main():
     print(net)
     net.to(device)
     ## Load weights
-    weights_was_saved_in_same_device = False
-    if weights_was_saved_in_same_device:
+    was_saved_in_same_device = False
+    if was_saved_in_same_device:
         ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
         load_weights = torch.load(weights_path)
     else:
@@ -137,7 +130,7 @@ def main():
     ## set as eval
     net.eval()
 
-    attitude_estimation = AttitudeEstimation(frame_id, device, size, mean, std, net)
+    attitude_estimation = AttitudeEstimation(device, size, mean, std, net)
 
     rospy.spin()
 
