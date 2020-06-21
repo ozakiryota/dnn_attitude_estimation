@@ -70,7 +70,6 @@ class AttitudeEstimation:
     def inputToMsg(self, acc):
         ## tensor to numpy
         acc = acc[0].detach().numpy()
-        print(acc)
         ## Vector3Stamped
         self.v_msg.vector.x = -acc[0]
         self.v_msg.vector.y = -acc[1]
