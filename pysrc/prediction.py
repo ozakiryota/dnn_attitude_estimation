@@ -17,6 +17,8 @@ from torchvision import models
 import torch.nn as nn
 from torchvision import transforms
 
+import vggbased_network
+
 class AttitudeEstimation:
     def __init__(self, frame_id, device, size, mean, std, net):
         ## subscriber
@@ -99,7 +101,7 @@ def main():
     ## Node
     rospy.init_node('attitude_estimation', anonymous=True)
     ## Param
-    weights_path = rospy.get_param("/weights_path", "weights.pth")
+    weights_path = rospy.get_param("/weights_path", "../weights/weights.pth")
     print("weights_path = ", weights_path)
     frame_id = rospy.get_param("/frame_id", "/base_link")
     print("frame_id = ", frame_id)
@@ -111,17 +113,9 @@ def main():
     ## size, mean, std
     size = 224  #VGG16
     mean = ([0.5, 0.5, 0.5])
-    std = ([0.25, 0.25, 0.25])
+    std = ([0.5, 0.5, 0.5])
     ## Network
-    net = models.vgg16()
-    net.features[26] = nn.Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(0, 0))
-    net.features = nn.Sequential(*list(net.features.children())[:-3])
-    net.avgpool = nn.Sequential()
-    net.classifier = nn.Sequential(
-        nn.Linear(in_features=73728, out_features=18, bias=True),
-        nn.ReLU(True),
-        nn.Linear(in_features=18, out_features=3, bias=True)
-    )
+    net = vggbased_network.OriginalNet()
     print(net)
     net.to(device)
     ## Load weights
