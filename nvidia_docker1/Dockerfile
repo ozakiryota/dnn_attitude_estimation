@@ -1,4 +1,5 @@
-FROM vistart/cuda:10.2-cudnn7-devel-ubuntu20.04
+FROM vistart/cuda:10.0-cudnn7-devel-ubuntu20.04
+# FROM nvidia/cuda:11.0-devel-ubuntu20.04
 
 ########## nvidia-docker1 hooks ##########
 LABEL com.nvidia.volumes.needed="nvidia_driver"
@@ -49,11 +50,14 @@ RUN echo "function cmk(){\n	lastpwd=\$OLDPWD \n	cpath=\$(pwd) \n cd /home/ros_ca
 ########## PyTorch ##########
 # RUN apt-get update && apt-get install -y python3-pip &&\
 # 	pip3 install torch torchvision
-RUN apt-get update && apt-get install -y python3-pip &&\
+RUN apt-get update && \
+	apt-get install -y \
+		python3-pip && \
 	pip3 install \
 		# https://download.pytorch.org/whl/cu102/torch-1.5.0-cp38-cp38-linux_x86_64.whl \
 		# https://download.pytorch.org/whl/cu102/torchvision-0.6.0-cp38-cp38-linux_x86_64.whl
-		torch==1.0.1 torchvision==0.2.2
+		torch==1.5.0 torchvision==0.6.0
+		# torch==1.0.1 torchvision==0.2.2
 ########## NO cache ##########
 ARG CACHEBUST=1
 ########## dnn_attitude_estimation ##########
