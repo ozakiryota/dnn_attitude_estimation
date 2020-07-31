@@ -32,7 +32,7 @@ class OriginalNet(nn.Module):
             if param_name in list_vgg_param_name:
                 # print("copy vgg: ", param_name)
                 vgg.state_dict()[param_name].requires_grad = True
-                self.state_dict()[param_name] = vgg.state_dict()[param_name]
+                # self.state_dict()[param_name] = vgg.state_dict()[param_name]
 
     def getParamValueList(self):
         list_cnn_param_value = []
