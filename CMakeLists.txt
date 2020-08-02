@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(dnn_attitude_estimation)
 
+add_compile_options(-std=c++11 -O2 -g -Wall)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -8,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  tf
+  Eigen3
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,6 +119,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -186,3 +191,6 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+#
+add_executable(dnn_attitude_estimation_ekf src/dnn_attitude_estimation_ekf.cpp)
+target_link_libraries(dnn_attitude_estimation_ekf ${catkin_LIBRARIES})

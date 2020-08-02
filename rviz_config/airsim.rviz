@@ -42,6 +42,8 @@ Visualization Manager:
           Value: true
         camera_0_optical/static:
           Value: true
+        combined_odom:
+          Value: true
         drone:
           Value: true
         drone/odom_local_ned:
@@ -63,6 +65,8 @@ Visualization Manager:
       Show Names: true
       Tree:
         odom:
+          combined_odom:
+            {}
           gyrodometry:
             {}
           odom/neu:
@@ -127,6 +131,16 @@ Visualization Manager:
       Name: Odometry
       Position Tolerance: 0.100000001
       Topic: /gyrodometry
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 0; 255; 0
+      Enabled: true
+      Keep: 10000
+      Length: 5
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /combined_odom
       Value: true
   Enabled: true
   Global Options:

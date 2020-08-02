@@ -8,12 +8,34 @@
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz_perspective" args="-d $(find dnn_attitude_estimation)/rviz_config/airsim.rviz"/>
 
+	<!-- semi sensor driver -->
+	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">
+		<remap from="in" to="/airsim_node/drone/camera_0/Scene"/>
+		<remap from="out" to="/decompressed_image"/>
+	</node>
+
 	<!-- msg conversion -->
 	<node pkg="msg_conversion" type="ned_to_neu" name="ned_to_neu">
 		<remap from="/odom" to="/airsim_node/drone/odom_local_ned"/>
 		<remap from="/imu/data" to="/airsim_node/drone/imu/Imu"/>
 		<!-- <param name="parent_frame_id" type="string" value="/odom"/> -->
 		<!-- <param name="child_frame_id" type="string" value="/odom/neu"/> -->
+	</node>
+
+	<!-- MAIN -->
+	<node pkg="dnn_attitude_estimation" name="dnn_attitude_estimation_ekf" type="dnn_attitude_estimation_ekf" output="screen">
+		<remap from="/imu/data" to="/imu/data/neu"/>
+		<param name="wait_inipose" type="bool" value="false"/>
+		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
+		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
+		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
+		<!-- <param name="sigma_camera_g" type="double" value="1.0e&#45;1"/> -->
+	</node>
+
+	<!-- for visualization -->
+	<node pkg="msg_conversion" name="combine_orientation_linear" type="combine_orientation_linear">
+		<remap from="/odom" to="/odom/neu"/>
+		<remap from="/orientation" to="/ekf/quat_rpy"/>
 	</node>
 
 	<!-- comparison -->

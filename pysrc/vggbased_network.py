@@ -11,7 +11,7 @@ class OriginalNet(nn.Module):
     def __init__(self):
         super(OriginalNet, self).__init__()
 
-        vgg = models.vgg16(pretrained=True)
+        vgg = models.vgg16(pretrained=False)
         self.features = vgg.features
         self.fc = nn.Sequential(
             nn.Linear(25088, 100),
@@ -32,7 +32,7 @@ class OriginalNet(nn.Module):
             if param_name in list_vgg_param_name:
                 # print("copy vgg: ", param_name)
                 vgg.state_dict()[param_name].requires_grad = True
-                # self.state_dict()[param_name] = vgg.state_dict()[param_name]
+                self.state_dict()[param_name] = vgg.state_dict()[param_name]
 
     def getParamValueList(self):
         list_cnn_param_value = []
