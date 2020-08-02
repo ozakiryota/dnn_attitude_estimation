@@ -1,0 +1,25 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- rosbag -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam.bag"/>
+
+	<!-- rviz -->
+	<node pkg="rviz" type="rviz" name="rviz_perspective" args="-d $(find dnn_attitude_estimation)/rviz_config/airsim.rviz"/>
+
+	<!-- msg conversion -->
+	<node pkg="msg_conversion" type="ned_to_neu" name="ned_to_neu">
+		<remap from="/odom" to="/airsim_node/drone/odom_local_ned"/>
+		<remap from="/imu/data" to="/airsim_node/drone/imu/Imu"/>
+		<!-- <param name="parent_frame_id" type="string" value="/odom"/> -->
+		<!-- <param name="child_frame_id" type="string" value="/odom/neu"/> -->
+	</node>
+
+	<!-- comparison -->
+	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d" output="screen">
+		<remap from="/odom" to="/odom/neu"/>
+		<remap from="/imu/data" to="/imu/data/neu"/>
+		<param name="wait_inipose" type="bool" value="false"/>
+	</node>
+</launch>
