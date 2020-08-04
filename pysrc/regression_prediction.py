@@ -48,8 +48,8 @@ class AttitudeEstimation:
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
-            acc = self.dnnPrediction(img_cv)
-            self.inputToMsg(acc)
+            outputs = self.dnnPrediction(img_cv)
+            self.inputMsg(outputs)
             self.publication(msg.header.stamp)
         except CvBridgeError as e:
             print(e)
@@ -69,16 +69,16 @@ class AttitudeEstimation:
         img_pil = Image.fromarray(img_cv)
         return img_pil
 
-    def inputToMsg(self, acc):
+    def inputMsg(self, outputs):
         ## tensor to numpy
-        acc = acc[0].detach().numpy()
+        outputs = outputs[0].detach().numpy()
         ## Vector3Stamped
-        self.v_msg.vector.x = -acc[0]
-        self.v_msg.vector.y = -acc[1]
-        self.v_msg.vector.z = -acc[2]
+        self.v_msg.vector.x = -outputs[0]
+        self.v_msg.vector.y = -outputs[1]
+        self.v_msg.vector.z = -outputs[2]
         ## QuaternionStamped
-        r = math.atan2(acc[1], acc[2])
-        p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
+        r = math.atan2(outputs[1], outputs[2])
+        p = math.atan2(-outputs[0], math.sqrt(outputs[1]*outputs[1] + outputs[2]*outputs[2]))
         y = 0.0
         print("r = ", r, ", p = ", p)
         q_tf = quaternion_from_euler(r, p, y)

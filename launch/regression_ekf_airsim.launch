@@ -48,7 +48,7 @@
 		<remap from="/rpy" to="/ekf/rpy"/>
 	</node>
 	<param name="erase_old_data" type="bool" value="False"/>
-	<node pkg="msg_printer" name="compare_rp" type="compare_rp.py" output="screen">
+	<node pkg="msg_printer" name="compare_rp" type="compare_rp.py">
 		<remap from="/truth/rpy" to="/gt/rpy"/>
 		<remap from="/estimation/rpy" to="/ekf/rpy"/>
 	</node>

@@ -4,6 +4,7 @@ import rospy
 from sensor_msgs.msg import Image as ImageMsg
 from geometry_msgs.msg import Vector3Stamped
 from geometry_msgs.msg import QuaternionStamped
+from geometry_msgs.msg import AccelWithCovarianceStamped
 from tf.transformations import quaternion_from_euler
 
 from cv_bridge import CvBridge, CvBridgeError
@@ -26,9 +27,11 @@ class AttitudeEstimation:
         ## publisher
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
         self.pub_quat = rospy.Publisher("/dnn/attitude", QuaternionStamped, queue_size=1)
+        self.pub_accel = rospy.Publisher("/dnn/g_vector_with_cov", AccelWithCovarianceStamped, queue_size=1)
         ## msg
         self.v_msg = Vector3Stamped()
         self.q_msg = QuaternionStamped()
+        self.accel_msg = AccelWithCovarianceStamped()
         ## cv_bridge
         self.bridge = CvBridge()
         ## copy arguments
@@ -48,8 +51,8 @@ class AttitudeEstimation:
         try:
             img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             print("img_cv.shape = ", img_cv.shape)
-            acc = self.dnnPrediction(img_cv)
-            self.inputToMsg(acc)
+            outputs = self.dnnPrediction(img_cv)
+            self.inputMsg(outputs)
             self.publication(msg.header.stamp)
         except CvBridgeError as e:
             print(e)
@@ -69,16 +72,19 @@ class AttitudeEstimation:
         img_pil = Image.fromarray(img_cv)
         return img_pil
 
-    def inputToMsg(self, acc):
+    def inputMsg(self, outputs):
+        ## get covariance matrix
+        cov = getCovMatrix(outputs)
         ## tensor to numpy
-        acc = acc[0].detach().numpy()
+        outputs = outputs[0].detach().numpy()
+        cov = cov[0].detach().numpy()
         ## Vector3Stamped
-        self.v_msg.vector.x = -acc[0]
-        self.v_msg.vector.y = -acc[1]
-        self.v_msg.vector.z = -acc[2]
+        self.v_msg.vector.x = -outputs[0]
+        self.v_msg.vector.y = -outputs[1]
+        self.v_msg.vector.z = -outputs[2]
         ## QuaternionStamped
-        r = math.atan2(acc[1], acc[2])
-        p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
+        r = math.atan2(outputs[1], outputs[2])
+        p = math.atan2(-outputs[0], math.sqrt(outputs[1]*outputs[1] + outputs[2]*outputs[2]))
         y = 0.0
         print("r = ", r, ", p = ", p)
         q_tf = quaternion_from_euler(r, p, y)
@@ -86,6 +92,31 @@ class AttitudeEstimation:
         self.q_msg.quaternion.y = q_tf[1]
         self.q_msg.quaternion.z = q_tf[2]
         self.q_msg.quaternion.w = q_tf[3]
+        ## AccelWithCovarianceStamped
+        self.accel_msg.accel.accel.linear.x = -outputs[0]
+        self.accel_msg.accel.accel.linear.y = -outputs[1]
+        self.accel_msg.accel.accel.linear.z = -outputs[2]
+        cov = self.getCovMatrix()
+        for i in range(len(cov)):
+            print("i = ", i)
+            self.accel_msg.accel.covariance[i] = outputs[i+3]
+
+    def getCovMatrix(self, outputs):
+        L = getTriangularMatrix(outputs)
+        Ltrans = torch.transpose(L, 1, 2)
+        LL = torch.bmm(L, Ltrans)
+        return LL
+
+    def getTriangularMatrix(self, outputs):
+        elements = outputs[:, 3:9]
+        L = torch.zeros(outputs.size(0), elements.size(1)//2, elements.size(1)//2)
+        L[:, 0, 0] = torch.exp(elements[:, 0])
+        L[:, 1, 0] = elements[:, 1]
+        L[:, 1, 1] = torch.exp(elements[:, 2])
+        L[:, 2, 0] = elements[:, 3]
+        L[:, 2, 1] = elements[:, 4]
+        L[:, 2, 2] = torch.exp(elements[:, 5])
+        return L
 
     def publication(self, stamp):
         ## Vector3Stamped

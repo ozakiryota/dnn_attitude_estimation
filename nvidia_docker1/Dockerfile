@@ -57,18 +57,6 @@ RUN apt-get update && \
 		torch==1.5.0 torchvision==0.6.0
 		# torch==1.0.1 torchvision==0.2.2
 ########## dnn_attitude_estimation ##########
-# ##### Eigen 3.1.0 #####
-# ## https://gitlab.com/libeigen/eigen/-/releases
-# RUN	mkdir -p /home/eigen_ws &&\
-# 	cd /home/eigen_ws &&\
-# 	wget https://gitlab.com/libeigen/eigen/-/archive/3.1.0/eigen-3.1.0.zip &&\
-# 	unzip eigen-3.1.0.zip &&\
-# 	cd eigen-3.1.0 && \
-# 	mkdir build &&\
-# 	cd build &&\
-# 	cmake .. &&\
-# 	make -j $(nproc --all) &&\
-# 	make install
 ##### NO cache #####
 ARG CACHEBUST=1
 ##### git clone #####
@@ -76,12 +64,12 @@ RUN	cd /home/ros_catkin_ws/src && \
 	git clone https://github.com/ozakiryota/dnn_attitude_estimation &&\
 	cd /home/ros_catkin_ws && \
 	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make"
-# RUN	cd /home/ros_catkin_ws/src && \
-# 	git clone https://github.com/ozakiryota/dnn_attitude_estimation
 ##### Authorize #####
 RUN	chmod +x /home/ros_catkin_ws/src/dnn_attitude_estimation/pysrc/regression_prediction.py
 ##### script #####
 RUN echo "#!/bin/bash \n source /opt/ros/noetic/setup.bash; source /home/ros_catkin_ws/devel/setup.bash; roslaunch dnn_attitude_estimation regression_prediction.launch" >> /home/regression_prediction.sh &&\
 	chmod +x /home/regression_prediction.sh
+RUN echo "#!/bin/bash \n source /opt/ros/noetic/setup.bash; source /home/ros_catkin_ws/devel/setup.bash; roslaunch dnn_attitude_estimation mle_prediction.launch" >> /home/mle_prediction.sh &&\
+	chmod +x /home/mle_prediction.sh
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation
