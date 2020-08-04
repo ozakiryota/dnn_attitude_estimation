@@ -198,3 +198,6 @@ include_directories(
 #
 add_executable(regression_ekf src/regression_ekf.cpp)
 target_link_libraries(regression_ekf ${catkin_LIBRARIES})
+#
+add_executable(mle_ekf src/mle_ekf.cpp)
+target_link_libraries(mle_ekf ${catkin_LIBRARIES})

@@ -1,0 +1,24 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- rosbag -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam.bag"/>
+
+	<!-- semi sensor driver -->
+	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">
+		<remap from="in" to="/airsim_node/drone/camera_0/Scene"/>
+		<remap from="out" to="/decompressed_image"/>
+	</node>
+
+	<!-- msg conversion -->
+	<node pkg="msg_conversion" type="ned_to_neu" name="ned_to_neu">
+		<remap from="/odom" to="/airsim_node/drone/odom_local_ned"/>
+		<remap from="/imu/data" to="/airsim_node/drone/imu/Imu"/>
+		<!-- <param name="parent_frame_id" type="string" value="/odom"/> -->
+		<!-- <param name="child_frame_id" type="string" value="/odom/neu"/> -->
+	</node>
+
+	<!-- rviz -->
+	<node pkg="rviz" type="rviz" name="rviz_perspective" args="-d $(find dnn_attitude_estimation)/rviz_config/play_bagdata_airsim.rviz"/>
+</launch>
