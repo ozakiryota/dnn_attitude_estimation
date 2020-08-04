@@ -11,4 +11,4 @@ nvidia-docker run -it --rm \
 	--net=host \
 	-v $root_path/../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
 	$image_name:nvidia_docker1 \
-	/bin/bash /home/launch.sh
+	/bin/bash /home/regression_prediction.sh

@@ -1,0 +1,8 @@
+<launch>
+	<!-- param -->
+	<param name="weights_path" type="str" value="$(find dnn_attitude_estimation)/weights/weights.pth"/>
+	<!-- MAIN -->
+	<node pkg="dnn_attitude_estimation" name="regression_prediction" type="regression_prediction.py" output="screen">
+		<remap from="/image_raw" to="/decompressed_image"/>
+	</node>
+</launch>

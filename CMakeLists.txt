@@ -192,5 +192,5 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 #
-add_executable(dnn_attitude_estimation_ekf src/dnn_attitude_estimation_ekf.cpp)
-target_link_libraries(dnn_attitude_estimation_ekf ${catkin_LIBRARIES})
+add_executable(regression_ekf src/regression_ekf.cpp)
+target_link_libraries(regression_ekf ${catkin_LIBRARIES})
