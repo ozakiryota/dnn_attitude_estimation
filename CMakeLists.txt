@@ -11,8 +11,12 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
-  Eigen3
+  # Eigen3
 )
+## For EIGEN
+## "find_packge(Eigen3)" did not work in Docker-Noetic
+find_package(PkgConfig) 
+pkg_check_modules(EIGEN3 REQUIRED eigen3) 
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
