@@ -69,7 +69,7 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_sigma_ini = " << _sigma_ini << std::endl;
 	_nhPrivate.param("sigma_imu", _sigma_imu, 1.0e-4);
 	std::cout << "_sigma_imu = " << _sigma_imu << std::endl;
-	_nhPrivate.param("sigma_camera_g", _sigma_camera_g, 1.0e-1);
+	_nhPrivate.param("sigma_camera_g", _sigma_camera_g, 1.0e+0);
 	std::cout << "_sigma_camera_g = " << _sigma_camera_g << std::endl;
 	/*sub*/
 	_sub_inipose = _nh.subscribe("/initial_orientation", 1, &DnnAttitudeEstimationEkf::callbackIniPose, this);
@@ -195,6 +195,7 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 
 void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma)
 {
+	std::cout << "- observationG -" << std::endl;
 	std::cout
 		<< "r[deg]: " << _x(0)/M_PI*180.0
 		<< ", "
@@ -224,7 +225,23 @@ void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma
 		-g*sin(_x(0))*cos(_x(1)),	-g*cos(_x(0))*sin(_x(1));
 	/*R*/
 	/*TODO: Receive a covariance matrix from dnn*/
-	Eigen::MatrixXd R = sigma*Eigen::MatrixXd::Identity(z.size(), z.size());
+	// Eigen::MatrixXd R = sigma*Eigen::MatrixXd::Identity(z.size(), z.size());
+	Eigen::MatrixXd R(z.size(), z.size());
+	R <<
+		g_msg.linear_acceleration_covariance[0],
+			g_msg.linear_acceleration_covariance[1],
+			g_msg.linear_acceleration_covariance[2],
+		g_msg.linear_acceleration_covariance[3],
+			g_msg.linear_acceleration_covariance[4],
+			g_msg.linear_acceleration_covariance[5],
+		g_msg.linear_acceleration_covariance[6],
+			g_msg.linear_acceleration_covariance[7],
+			g_msg.linear_acceleration_covariance[8];
+	std::cout << "R = " << std::endl << R << std::endl;
+	R(0, 0) = sigma*R(0, 0);
+	R(1, 1) = sigma*R(1, 1);
+	R(2, 2) = sigma*R(2, 2);
+	std::cout << "R = " << std::endl << R << std::endl;
 	/*I*/
 	Eigen::MatrixXd I = Eigen::MatrixXd::Identity(_x.size(), _x.size());
 	/*y, s, K*/

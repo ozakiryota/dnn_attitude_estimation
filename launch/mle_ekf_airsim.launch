@@ -29,7 +29,7 @@
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<param name="sigma_camera_g" type="double" value="1.0e+1"/>
+		<param name="sigma_camera_g" type="double" value="1.0e+3"/>
 	</node>
 
 	<!-- visualization -->

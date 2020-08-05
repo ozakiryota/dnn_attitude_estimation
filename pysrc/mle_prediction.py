@@ -4,7 +4,6 @@ import rospy
 from sensor_msgs.msg import Image as ImageMsg
 from geometry_msgs.msg import Vector3Stamped
 from geometry_msgs.msg import QuaternionStamped
-# from geometry_msgs.msg import AccelWithCovarianceStamped
 from sensor_msgs.msg import Imu
 from tf.transformations import quaternion_from_euler
 
@@ -24,7 +23,7 @@ import vggbased_network
 class AttitudeEstimation:
     def __init__(self, frame_id, device, size, mean, std, net):
         ## subscriber
-        self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage)
+        self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage, queue_size=1, buff_size=2**24)
         ## publisher
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
         self.pub_quat = rospy.Publisher("/dnn/attitude", QuaternionStamped, queue_size=1)
@@ -137,6 +136,7 @@ class AttitudeEstimation:
             imu.linear_acceleration_covariance[i] = math.nan
 
     def publication(self, stamp):
+        print("delay[s]: ", (rospy.Time.now() - stamp).to_sec())
         ## Vector3Stamped
         self.v_msg.header.stamp = stamp
         self.v_msg.header.frame_id = self.frame_id
