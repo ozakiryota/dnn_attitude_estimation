@@ -4,7 +4,6 @@ import rospy
 from sensor_msgs.msg import Image as ImageMsg
 from geometry_msgs.msg import Vector3Stamped
 from geometry_msgs.msg import QuaternionStamped
-from tf.transformations import quaternion_from_euler
 
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -25,10 +24,8 @@ class AttitudeEstimation:
         self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage)
         ## publisher
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
-        self.pub_quat = rospy.Publisher("/dnn/attitude", QuaternionStamped, queue_size=1)
         ## msg
         self.v_msg = Vector3Stamped()
-        self.q_msg = QuaternionStamped()
         ## cv_bridge
         self.bridge = CvBridge()
         ## copy arguments
@@ -71,31 +68,17 @@ class AttitudeEstimation:
 
     def inputMsg(self, outputs):
         ## tensor to numpy
-        outputs = outputs[0].detach().numpy()
+        outputs = outputs[0].cpu().detach().numpy()
         ## Vector3Stamped
         self.v_msg.vector.x = -outputs[0]
         self.v_msg.vector.y = -outputs[1]
         self.v_msg.vector.z = -outputs[2]
-        ## QuaternionStamped
-        r = math.atan2(outputs[1], outputs[2])
-        p = math.atan2(-outputs[0], math.sqrt(outputs[1]*outputs[1] + outputs[2]*outputs[2]))
-        y = 0.0
-        print("r = ", r, ", p = ", p)
-        q_tf = quaternion_from_euler(r, p, y)
-        self.q_msg.quaternion.x = q_tf[0]
-        self.q_msg.quaternion.y = q_tf[1]
-        self.q_msg.quaternion.z = q_tf[2]
-        self.q_msg.quaternion.w = q_tf[3]
 
     def publication(self, stamp):
         ## Vector3Stamped
         self.v_msg.header.stamp = stamp
         self.v_msg.header.frame_id = self.frame_id
         self.pub_vector.publish(self.v_msg)
-        ## QuaternionStamped
-        self.q_msg.header.stamp = stamp
-        self.q_msg.header.frame_id = self.frame_id
-        self.pub_quat.publish(self.q_msg)
 
 def main():
     ## Node

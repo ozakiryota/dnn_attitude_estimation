@@ -1,7 +1,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 // #include <geometry_msgs/Vector3Stamped.h>
-#include <sensor_msgs/Imu.h>
 #include <geometry_msgs/QuaternionStamped.h>
 #include <tf/tf.h>
 #include <Eigen/Core>
@@ -39,6 +38,7 @@ class DnnAttitudeEstimationEkf{
 		double _sigma_ini;
 		double _sigma_imu;
 		double _sigma_camera_g;
+		double _th_mul_sigma;
 
 	public:
 		DnnAttitudeEstimationEkf();
@@ -71,6 +71,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_sigma_imu = " << _sigma_imu << std::endl;
 	_nhPrivate.param("sigma_camera_g", _sigma_camera_g, 1.0e+0);
 	std::cout << "_sigma_camera_g = " << _sigma_camera_g << std::endl;
+	_nhPrivate.param("th_mul_sigma", _th_mul_sigma, 5.0e-4);
+	std::cout << "_th_mul_sigma = " << _th_mul_sigma << std::endl;
 	/*sub*/
 	_sub_inipose = _nh.subscribe("/initial_orientation", 1, &DnnAttitudeEstimationEkf::callbackIniPose, this);
 	_sub_imu = _nh.subscribe("/imu/data", 1, &DnnAttitudeEstimationEkf::callbackIMU, this);
@@ -137,7 +139,7 @@ void DnnAttitudeEstimationEkf::callbackIMU(const sensor_msgs::ImuConstPtr& msg)
 	_stamp_imu_last = msg->header.stamp;
 
 	/*test*/
-	//observationG(*msg, 1.0e-0);
+	//observationG(*msg, 1.0e+3);
 }
 
 void DnnAttitudeEstimationEkf::callbackBias(const sensor_msgs::ImuConstPtr& msg)
@@ -196,6 +198,16 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma)
 {
 	std::cout << "- observationG -" << std::endl;
+	/*judge*/
+	double mul_sigma = sqrt(g_msg.linear_acceleration_covariance[0])
+		*sqrt(g_msg.linear_acceleration_covariance[4])
+		*sqrt(g_msg.linear_acceleration_covariance[8]);
+	if(mul_sigma > _th_mul_sigma){
+		std::cout << "REJECT: mul_sigma = " << mul_sigma << " > " << _th_mul_sigma << std::endl;
+		return;
+	}
+	std::cout << "mul_sigma = " << mul_sigma << std::endl;
+	/*print*/
 	std::cout
 		<< "r[deg]: " << _x(0)/M_PI*180.0
 		<< ", "
@@ -224,7 +236,6 @@ void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma
 		g*cos(_x(0))*cos(_x(1)),	-g*sin(_x(0))*sin(_x(1)),
 		-g*sin(_x(0))*cos(_x(1)),	-g*cos(_x(0))*sin(_x(1));
 	/*R*/
-	/*TODO: Receive a covariance matrix from dnn*/
 	// Eigen::MatrixXd R = sigma*Eigen::MatrixXd::Identity(z.size(), z.size());
 	Eigen::MatrixXd R(z.size(), z.size());
 	R <<
@@ -237,7 +248,6 @@ void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma
 		g_msg.linear_acceleration_covariance[6],
 			g_msg.linear_acceleration_covariance[7],
 			g_msg.linear_acceleration_covariance[8];
-	std::cout << "R = " << std::endl << R << std::endl;
 	R(0, 0) = sigma*R(0, 0);
 	R(1, 1) = sigma*R(1, 1);
 	R(2, 2) = sigma*R(2, 2);

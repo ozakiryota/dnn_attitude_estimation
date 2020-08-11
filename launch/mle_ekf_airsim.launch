@@ -3,10 +3,11 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- rosbag -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam_202008020251.bag"/> -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam_lidar_202008091113.bag"/>
 
 	<!-- rviz -->
-	<node pkg="rviz" type="rviz" name="rviz_perspective" args="-d $(find dnn_attitude_estimation)/rviz_config/ekf_airsim.rviz"/>
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/ekf_airsim.rviz"/>
 
 	<!-- semi sensor driver -->
 	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">
@@ -29,7 +30,8 @@
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<param name="sigma_camera_g" type="double" value="1.0e+3"/>
+		<param name="sigma_camera_g" type="double" value="1.0e+4"/>
+		<param name="th_mul_sigma" type="double" value="2.0e-4"/>
 	</node>
 
 	<!-- visualization -->
