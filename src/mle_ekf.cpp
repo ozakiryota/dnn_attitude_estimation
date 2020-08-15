@@ -17,8 +17,8 @@ class DnnAttitudeEstimationEkf{
 		ros::Subscriber _sub_bias;
 		ros::Subscriber _sub_camera_g;
 		/*publisher*/
-		ros::Publisher _pub_rp;
-		ros::Publisher _pub_rpy;
+		ros::Publisher _pub_quat_rp;
+		ros::Publisher _pub_quat_rpy;
 		/*state*/
 		Eigen::Vector2d _x;	//(roll, pitch)
 		Eigen::Matrix2d _P;
@@ -79,8 +79,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	_sub_bias = _nh.subscribe("/imu/bias", 1, &DnnAttitudeEstimationEkf::callbackBias, this);
 	_sub_camera_g = _nh.subscribe("/dnn/g_vector_with_cov", 1, &DnnAttitudeEstimationEkf::callbackCameraG, this);
 	/*pub*/
-	_pub_rp = _nh.advertise<geometry_msgs::QuaternionStamped>("/ekf/quat_rp", 1);
-	_pub_rpy = _nh.advertise<geometry_msgs::QuaternionStamped>("/ekf/quat_rpy", 1);
+	_pub_quat_rp = _nh.advertise<geometry_msgs::QuaternionStamped>("/ekf/quat_rp", 1);
+	_pub_quat_rpy = _nh.advertise<geometry_msgs::QuaternionStamped>("/ekf/quat_rpy", 1);
 	/*initialize*/
 	initializeState();
 }
@@ -276,7 +276,7 @@ void DnnAttitudeEstimationEkf::publication(ros::Time stamp)
 	q_rp_msg.quaternion.y = q_rp.y();
 	q_rp_msg.quaternion.z = q_rp.z();
 	q_rp_msg.quaternion.w = q_rp.w();
-	_pub_rp.publish(q_rp_msg);
+	_pub_quat_rp.publish(q_rp_msg);
 	/*RPY*/
 	tf::Quaternion q_rpy = tf::createQuaternionFromRPY(_x(0), _x(1), _yaw);
 	geometry_msgs::QuaternionStamped q_rpy_msg;
@@ -286,7 +286,7 @@ void DnnAttitudeEstimationEkf::publication(ros::Time stamp)
 	q_rpy_msg.quaternion.y = q_rpy.y();
 	q_rpy_msg.quaternion.z = q_rpy.z();
 	q_rpy_msg.quaternion.w = q_rpy.w();
-	_pub_rpy.publish(q_rpy_msg);
+	_pub_quat_rpy.publish(q_rpy_msg);
 	/*print*/
 	// std::cout << "r[deg]: " << _x(0) << " p[deg]: " << _x(1) << std::endl;
 }
