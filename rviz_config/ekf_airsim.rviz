@@ -46,6 +46,8 @@ Visualization Manager:
           Value: true
         drone:
           Value: true
+        drone/LidarCustom:
+          Value: true
         drone/odom_local_ned:
           Value: true
         gyrodometry:
@@ -103,16 +105,6 @@ Visualization Manager:
       Transport Hint: compressed
       Unreliable: false
       Value: true
-    - Angle Tolerance: 0.100000001
-      Class: rviz/Odometry
-      Color: 255; 25; 0
-      Enabled: true
-      Keep: 10000
-      Length: 5
-      Name: Odometry
-      Position Tolerance: 0.100000001
-      Topic: /odom/neu
-      Value: true
     - Alpha: 1
       Class: rviz_plugin_tutorials/Imu
       Color: 204; 51; 204
@@ -125,6 +117,16 @@ Visualization Manager:
     - Angle Tolerance: 0.100000001
       Class: rviz/Odometry
       Color: 0; 0; 255
+      Enabled: true
+      Keep: 10000
+      Length: 5
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /odom/neu
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 255; 25; 0
       Enabled: true
       Keep: 10000
       Length: 5

@@ -136,7 +136,7 @@ def main():
     ## Node
     rospy.init_node('attitude_estimation', anonymous=True)
     ## Param
-    weights_path = rospy.get_param("/weights_path", "../weights/weights.pth")
+    weights_path = rospy.get_param("/weights_path", "../weights/mle.pth")
     print("weights_path = ", weights_path)
     frame_id = rospy.get_param("/frame_id", "/base_link")
     print("frame_id = ", frame_id)
@@ -154,7 +154,7 @@ def main():
     print(net)
     net.to(device)
     ## Load weights
-    weights_was_saved_in_same_device = False
+    weights_was_saved_in_same_device = True
     if weights_was_saved_in_same_device:
         ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
         load_weights = torch.load(weights_path)

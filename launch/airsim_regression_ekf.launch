@@ -3,13 +3,14 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- rosbag -->
-	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam_202008020251.bag"/> -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/docker_ws/airsim_ros_wrapper/bagfiles/drone_1cam_lidar_202008131352.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_202008020251.bag"/> -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202008290246.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202008301203.bag"/> -->
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/ekf_airsim.rviz"/>
 
-	<!-- semi sensor driver -->
+	<!-- image -->
 	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">
 		<remap from="in" to="/airsim_node/drone/camera_0/Scene"/>
 		<remap from="out" to="/decompressed_image"/>
@@ -18,7 +19,8 @@
 	<!-- msg conversion -->
 	<node pkg="msg_conversion" type="ned_to_neu" name="ned_to_neu">
 		<remap from="/odom" to="/airsim_node/drone/odom_local_ned"/>
-		<remap from="/imu/data" to="/airsim_node/drone/imu/Imu"/>
+		<!-- <remap from="/imu/data" to="/airsim_node/drone/imu/Imu"/> -->
+		<remap from="/imu/data" to="/airsim_node/drone/imu/Imu/with_noise"/>
 		<!-- <param name="parent_frame_id" type="string" value="/odom"/> -->
 		<!-- <param name="child_frame_id" type="string" value="/odom/neu"/> -->
 	</node>
@@ -34,30 +36,5 @@
 	</node>
 
 	<!-- visualization -->
-	<node pkg="msg_conversion" name="combine_orientation_linear" type="combine_orientation_linear">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/orientation" to="/ekf/quat_rpy"/>
-	</node>
-
-	<!-- validation -->
-	<node pkg="msg_conversion" name="odometry_to_rpy" type="odometry_to_rpy">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/rpy" to="/gt/rpy"/>
-	</node>
-	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
-		<remap from="/quat" to="/ekf/quat_rpy"/>
-		<remap from="/rpy" to="/ekf/rpy"/>
-	</node>
-	<param name="erase_old_data" type="bool" value="False"/>
-	<node pkg="msg_printer" name="compare_rp" type="compare_rp.py">
-		<remap from="/truth/rpy" to="/gt/rpy"/>
-		<remap from="/estimation/rpy" to="/ekf/rpy"/>
-	</node>
-
-	<!-- comparison -->
-	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/imu/data" to="/imu/data/neu"/>
-		<param name="wait_inipose" type="bool" value="false"/>
-	</node>
+	<include file="$(find dnn_attitude_estimation)/launch/validation.launch"/>
 </launch>

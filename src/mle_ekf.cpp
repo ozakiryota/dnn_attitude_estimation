@@ -34,6 +34,7 @@ class DnnAttitudeEstimationEkf{
 		bool _got_bias = false;
 		/*parameter*/
 		bool _wait_inipose;
+		bool _use_quaternion_for_rotation;
 		std::string _frame_id;
 		double _sigma_ini;
 		double _sigma_imu;
@@ -63,6 +64,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	/*parameter*/
 	_nhPrivate.param("wait_inipose", _wait_inipose, false);
 	std::cout << "_wait_inipose = " << (bool)_wait_inipose << std::endl;
+	_nhPrivate.param("use_quaternion_for_rotation", _use_quaternion_for_rotation, false);
+	std::cout << "_use_quaternion_for_rotation = " << (bool)_use_quaternion_for_rotation << std::endl;
 	_nhPrivate.param("frame_id", _frame_id, std::string("/base_link"));
 	std::cout << "_frame_id = " << _frame_id << std::endl;
 	_nhPrivate.param("sigma_ini", _sigma_ini, 1.0e-10);
@@ -130,7 +133,7 @@ void DnnAttitudeEstimationEkf::callbackIMU(const sensor_msgs::ImuConstPtr& msg)
 		return;
 	}
 	/*(estimate yaw)*/
-	estimateYaw(*msg, dt);
+	if(!_use_quaternion_for_rotation)	estimateYaw(*msg, dt);
 	/*prediction*/
 	predictionIMU(*msg, dt);
 	/*publication*/
@@ -177,9 +180,21 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 		u = u - b;
 	}
 	/*f*/
-	Eigen::MatrixXd Rot(_x.size(), u.size());
-	getRotMatrixRP(_x(0), _x(1), Rot);
-	Eigen::VectorXd f = _x + Rot*u;
+	Eigen::VectorXd f(_x.size());
+	if(_use_quaternion_for_rotation){
+		tf::Quaternion q_pose = tf::createQuaternionFromRPY(_x(0), _x(1), _yaw);
+		tf::Quaternion q_rel_rot = tf::createQuaternionFromRPY(u(0), u(1), u(2));
+		q_pose = q_pose*q_rel_rot;
+		q_pose.normalize();
+		tf::Matrix3x3(q_pose).getRPY(f(0), f(1), _yaw);
+	}
+	else{
+		Eigen::MatrixXd Rot(_x.size(), u.size());
+		getRotMatrixRP(_x(0), _x(1), Rot);
+		f = _x + Rot*u;
+		/*-pi to pi*/
+		for(int i=0; i<f.size(); ++i)	anglePiToPi(f(i));
+	}
 	/*jF*/
 	Eigen::MatrixXd jF(_x.size(), _x.size());
 	jF(0, 0) = 1 + u(1)*cos(_x(0))*tan(_x(1)) - u(2)*sin(_x(0))*tan(_x(1));
@@ -191,8 +206,6 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 	/*Update*/
 	_x = f;
 	_P = jF*_P*jF.transpose() + Q;
-	/*-pi to pi*/
-	for(int i=0;i<_x.size();++i)	anglePiToPi(_x(i));
 }
 
 void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma)
