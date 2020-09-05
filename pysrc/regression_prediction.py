@@ -16,7 +16,7 @@ from torchvision import models
 import torch.nn as nn
 from torchvision import transforms
 
-import vggbased_network
+import network_regression
 
 class AttitudeEstimation:
     def __init__(self, frame_id, device, size, mean, std, net):
@@ -98,16 +98,18 @@ def main():
     mean = ([0.5, 0.5, 0.5])
     std = ([0.5, 0.5, 0.5])
     ## Network
-    net = vggbased_network.OriginalNet()
+    net = network_regression.OriginalNet()
     print(net)
     net.to(device)
     ## Load weights
     weights_was_saved_in_same_device = True
     if weights_was_saved_in_same_device:
         ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
+        print("Loaded: GPU -> GPU or CPU -> CPU")
         load_weights = torch.load(weights_path)
     else:
         ## saved in GPU -> load in CPU
+        print("Loaded: GPU -> CPU")
         load_weights = torch.load(weights_path, map_location={"cuda:0": "cpu"})
     net.load_state_dict(load_weights)
     ## set as eval

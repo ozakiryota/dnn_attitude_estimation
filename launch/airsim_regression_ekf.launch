@@ -4,8 +4,9 @@
 
 	<!-- rosbag -->
 	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_202008020251.bag"/> -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202008290246.bag"/>
-	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202008301203.bag"/> -->
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202008290246.bag"/> -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202009011526.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202009041502.bag"/> -->
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/ekf_airsim.rviz"/>
@@ -37,4 +38,5 @@
 
 	<!-- visualization -->
 	<include file="$(find dnn_attitude_estimation)/launch/validation.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison.launch"/> -->
 </launch>

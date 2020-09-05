@@ -40,6 +40,9 @@ class DnnAttitudeEstimationEkf{
 		double _sigma_imu;
 		double _sigma_camera_g;
 		double _th_mul_sigma;
+		/*counter*/
+		int _counter_camera_g = 0;
+		int _counter_camera_g_rejected = 0;
 
 	public:
 		DnnAttitudeEstimationEkf();
@@ -49,6 +52,7 @@ class DnnAttitudeEstimationEkf{
 		void callbackBias(const sensor_msgs::ImuConstPtr& msg);
 		void callbackCameraG(const sensor_msgs::ImuConstPtr& msg);
 		void predictionIMU(sensor_msgs::Imu imu, double dt);
+		bool varIsSmallEnough(sensor_msgs::Imu g_msg);
 		void observationG(sensor_msgs::Imu g, double sigma);
 		void publication(ros::Time stamp);
 		void estimateYaw(sensor_msgs::Imu imu, double dt);
@@ -157,10 +161,19 @@ void DnnAttitudeEstimationEkf::callbackCameraG(const sensor_msgs::ImuConstPtr& m
 {
 	/*wait initial orientation*/
 	if(!_got_inipose)	return;
-	/*observation*/
-	observationG(*msg, _sigma_camera_g);
-	/*publication*/
-	publication(msg->header.stamp);
+	/*judge*/
+	if(varIsSmallEnough(*msg)){
+		/*observation*/
+		observationG(*msg, _sigma_camera_g);
+		/*publication*/
+		publication(msg->header.stamp);
+	}
+	/*counter*/
+	else	++_counter_camera_g_rejected;
+	++_counter_camera_g;
+	std::cout << "_counter_camera_g_rejected / _counter_camera_g = "
+		<< _counter_camera_g_rejected << " / " << _counter_camera_g
+		<< " (" << 100.0*_counter_camera_g_rejected/(double)_counter_camera_g << " %)" << std::endl;
 }
 
 void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
@@ -208,19 +221,24 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 	_P = jF*_P*jF.transpose() + Q;
 }
 
-void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma)
+bool DnnAttitudeEstimationEkf::varIsSmallEnough(sensor_msgs::Imu g_msg)
 {
-	std::cout << "- observationG -" << std::endl;
 	/*judge*/
 	double mul_sigma = sqrt(g_msg.linear_acceleration_covariance[0])
 		*sqrt(g_msg.linear_acceleration_covariance[4])
 		*sqrt(g_msg.linear_acceleration_covariance[8]);
 	if(mul_sigma > _th_mul_sigma){
 		std::cout << "REJECT: mul_sigma = " << mul_sigma << " > " << _th_mul_sigma << std::endl;
-		return;
+		return false;
 	}
 	std::cout << "mul_sigma = " << mul_sigma << std::endl;
+	return true;
+}
+
+void DnnAttitudeEstimationEkf::observationG(sensor_msgs::Imu g_msg, double sigma)
+{
 	/*print*/
+	std::cout << "- observationG -" << std::endl;
 	std::cout
 		<< "r[deg]: " << _x(0)/M_PI*180.0
 		<< ", "
