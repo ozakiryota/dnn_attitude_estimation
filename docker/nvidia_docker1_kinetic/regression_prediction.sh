@@ -9,8 +9,8 @@ nvidia-docker run -it --rm \
 	--env="QT_X11_NO_MITSHM=1" \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--net=host \
-	-v $root_path/../weights:/home/ros_catkin_ws/src/$image_name/weights \
-	-v $root_path/../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
+	-v $root_path/../../weights:/home/ros_catkin_ws/src/$image_name/weights \
+	-v $root_path/../../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
 	--env="OMP_NUM_THREADS=1" \
 	$image_name:nvidia_docker1_kinetic \
-	/bin/bash /home/mle_prediction.sh
+	/bin/bash /home/regression_prediction.sh
