@@ -1,6 +1,8 @@
 "node pkg=""msg_conversion"" type=""imu_add_noise"" name=""imu_add_noise""",angular_noise_std,0.1
 ,linear_noise_std,0.1
 ,,
+"node pkg=""pc_store"" name=""lower_pc_hz"" type=""lower_pc_hz""",target_hz,20
+,,
 "node pkg=""gyrodometry"" name=""gyrodometry3d"" type=""gyrodometry3d""",-,-
 ,,
 "node pkg=""imu_ekf"" name=""imu_ekf_rpy"" type=""imu_ekf_rpy""",sigma_ini,1E-10
@@ -19,12 +21,12 @@
 ,max_iterations,10
 ,erase_out_of_range_pc,TRUE
 ,,
-"node pkg=""dnn_attitude_estimation"" name=""regression_ekf"" type=""regression_ekf""",sigma_ini,1.00E-10
-,sigma_imu,1.00E-04
-,sigma_camera_g,1.00E+01
+"node pkg=""dnn_attitude_estimation"" name=""regression_ekf"" type=""regression_ekf""",sigma_ini,1E-10
+,sigma_imu,0.0001
+,sigma_camera_g,10
 ,,
 "node pkg=""dnn_attitude_estimation"" name=""mle_ekf"" type=""mle_ekf""",use_quaternion_for_rotation,FALSE
-,sigma_ini,1.00E-10
-,sigma_imu,1.00E-04
-,sigma_camera_g,1.00E+04
-,th_mul_sigma,8.00E-05
+,sigma_ini,1E-10
+,sigma_imu,0.0001
+,sigma_camera_g,10000
+,th_mul_sigma,0.00008
