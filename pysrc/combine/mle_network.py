@@ -6,31 +6,22 @@ from torchvision import models
 import torch.nn as nn
 
 class OriginalNet(nn.Module):
-    def __init__(self):
+    def __init__(self, num_images, resize=224, use_pretrained=True):
         super(OriginalNet, self).__init__()
 
-        vgg = models.vgg16(pretrained=False)
+        vgg = models.vgg16(pretrained=use_pretrained)
         self.features = vgg.features
+        num_fc_in_features = num_images*(resize//32)**2*512
+        print("num_fc_in_features = ", num_fc_in_features)
         self.fc = nn.Sequential(
-            nn.Linear(25088, 100),
+            nn.Linear(num_fc_in_features, 100),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
             nn.Linear(100, 18),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
-            nn.Linear(18, 3)
+            nn.Linear(18, 9)    #(x, y, z, L00, L10, L11, L20, L21, L22)
         )
-        self.copyVggParam(vgg)
-
-    def copyVggParam(self, vgg):
-        list_vgg_param_name = []
-        for param_name, _ in vgg.named_parameters():
-            list_vgg_param_name.append(param_name)
-        for param_name, param_value in self.named_parameters():
-            if param_name in list_vgg_param_name:
-                # print("copy vgg: ", param_name)
-                vgg.state_dict()[param_name].requires_grad = True
-                self.state_dict()[param_name] = vgg.state_dict()[param_name]
 
     def getParamValueList(self):
         list_cnn_param_value = []
@@ -60,25 +51,33 @@ class OriginalNet(nn.Module):
         return x
 
 ##### test #####
-# import data_transform
+# import sys
+# sys.path.append('../')
+# from common_combine import data_transform_model
+# ## image
+# img_path_list = [
+#     "../../../dataset_image_to_gravity/AirSim/5cam/example/camera_0.jpg",
+#     "../../../dataset_image_to_gravity/AirSim/5cam/example/camera_72.jpg",
+#     "../../../dataset_image_to_gravity/AirSim/5cam/example/camera_144.jpg",
+#     "../../../dataset_image_to_gravity/AirSim/5cam/example/camera_216.jpg",
+#     "../../../dataset_image_to_gravity/AirSim/5cam/example/camera_288.jpg"
+# ]
+# ## label
+# acc_list = [0, 0, 1]
+# acc_numpy = np.array(acc_list)
 # ## network
-# net = OriginalNet()
+# net = OriginalNet(len(img_path_list))
 # print(net)
 # list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 # # print(list_fc_param_value)
-# ## image
-# image_file_path = "../dataset/example.jpg"
-# img = Image.open(image_file_path)
-# ## label
-# g_list = [0, 0, 1]
-# acc = np.array(g_list)
 # ## trans param
-# size = 224  #VGG16
+# resize = 224
+# # resize = 112
 # mean = ([0.5, 0.5, 0.5])
 # std = ([0.5, 0.5, 0.5])
 # ## transform
-# transform = data_transform.data_transform(size, mean, std)
-# img_trans, _ = transform(img, acc, phase="train")
+# transform = data_transform_model.DataTransform(resize, mean, std)
+# img_trans, _ = transform(img_path_list, acc_numpy)
 # ## prediction
 # inputs = img_trans.unsqueeze_(0)
 # print("inputs.size() = ", inputs.size())

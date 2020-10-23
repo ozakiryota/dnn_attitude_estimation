@@ -101,6 +101,12 @@ RUN echo "#!/bin/bash \n \
 		source /home/ros_catkin_ws/devel/setup.bash; \n \
 		source /home/catkin_build_ws/install/setup.bash --extend; \n \
 		roslaunch dnn_attitude_estimation mle_prediction.launch" >> /home/mle_prediction.sh &&\
-	chmod +x /home/mle_prediction.sh
+	chmod +x /home/mle_prediction.sh && \
+	echo "#!/bin/bash \n \
+		source /opt/ros/kinetic/setup.bash; \n \
+		source /home/ros_catkin_ws/devel/setup.bash; \n \
+		source /home/catkin_build_ws/install/setup.bash --extend; \n \
+		roslaunch dnn_attitude_estimation combine_mle_prediction.launch" >> /home/combine_mle_prediction.sh &&\
+	chmod +x /home/combine_mle_prediction.sh
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation

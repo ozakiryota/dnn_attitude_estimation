@@ -18,7 +18,7 @@ class OriginalNet(nn.Module):
             nn.Linear(100, 18),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
-            nn.Linear(18, 9)    #(x, y, z, sx, sy, sz, corr_xy, corr_yz, corr_zx)
+            nn.Linear(18, 3)
         )
         self.copyVggParam(vgg)
 
@@ -57,35 +57,4 @@ class OriginalNet(nn.Module):
         # print("fc-out", x.size())
         l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
         x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
-        # x[:, 3:6] = torch.exp(x[:, 3:6])    #(sx, sy, sz) > 0
-        # x[:, 6:9] = torch.tanh(x[:, 6:9])   #1 > (corr_xy, corr_yz, corr_zx) > -1
-        # print("x[:, :3] = ", x[:, :3])
-        # print("x[:, 3:6] = ", x[:, 3:6])
-        # print("x[:, 6:9] = ", x[:, 6:9])
         return x
-
-##### test #####
-# import data_transform
-# ## network
-# net = OriginalNet()
-# print(net)
-# list_cnn_param_value, list_fc_param_value = net.getParamValueList()
-# # print(list_fc_param_value)
-# ## image
-# image_file_path = "../dataset/example.jpg"
-# img = Image.open(image_file_path)
-# ## label
-# g_list = [0, 0, 9.81]
-# acc = np.array(g_list)
-# ## trans param
-# size = 224  #VGG16
-# mean = ([0.5, 0.5, 0.5])
-# std = ([0.5, 0.5, 0.5])
-# ## transform
-# transform = data_transform.data_transform(size, mean, std)
-# img_trans, _ = transform(img, acc, phase="train")
-# ## prediction
-# inputs = img_trans.unsqueeze_(0)
-# print("inputs.size() = ", inputs.size())
-# outputs = net(inputs)
-# print("outputs.size() = ", outputs.size())
