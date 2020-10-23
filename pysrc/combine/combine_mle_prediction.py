@@ -10,6 +10,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 from PIL import Image
 import math
+import numpy as np
 
 import torch
 from torchvision import models
@@ -19,11 +20,11 @@ from torchvision import transforms
 import mle_network
 
 class AttitudeEstimation:
-    def __init__(self, net):
+    def __init__(self):
         print("--- mle_prediction ---")
         ## parameter-msg
         self.frame_id = rospy.get_param("/frame_id", "/base_link")
-        print("frame_id = ", frame_id)
+        print("self.frame_id = ", self.frame_id)
         self.num_cameras = rospy.get_param("/num_cameras", 1)
         print("self.num_cameras = ", self.num_cameras)
         ## parameter-dnn
@@ -38,7 +39,7 @@ class AttitudeEstimation:
         ## subscriber
         self.list_sub = []
         for camera_idx in range(self.num_cameras):
-            sub_imgae = rospy.Subscriber("/image_raw" + str(camera_idx), ImageMsg, self.callbackImage, callback_args=camera_idx, queue_size=1, buff_size=2**24)
+            sub_image = rospy.Subscriber("/image_raw" + str(camera_idx), ImageMsg, self.callbackImage, callback_args=camera_idx, queue_size=1, buff_size=2**24)
             self.list_sub.append(sub_image)
         ## publisher
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
@@ -48,17 +49,14 @@ class AttitudeEstimation:
         self.accel_msg = Imu()
         ## cv_bridge
         self.bridge = CvBridge()
+        ## list
         self.list_img_cv = [np.empty(0)]*self.num_cameras
-        ## flag
-        self.done_init = False
         self.list_got_new_img = [False]*self.num_cameras
         ## dnn
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        print("device = ", device)
+        print("self.device = ", self.device)
         self.img_transform = self.getImageTransform(resize, mean_element, std_element)
-        self.net = getNetwork(resize, weights_path)
-        ## done
-        self.done_init = True
+        self.net = self.getNetwork(resize, weights_path)
 
     def getImageTransform(self, resize, mean_element, std_element):
         mean = ([mean_element, mean_element, mean_element])
@@ -72,7 +70,7 @@ class AttitudeEstimation:
         return img_transform
 
     def getNetwork(self, resize, weights_path):
-        net = network.OriginalNet(self.num_cameras, resize=resize, use_pretrained=False)
+        net = mle_network.OriginalNet(self.num_cameras, resize=resize, use_pretrained=False)
         print(net)
         net.to(self.device)
         net.eval()
@@ -87,26 +85,25 @@ class AttitudeEstimation:
         return net
 
     def callbackImage(self, msg, camera_idx):
-        if self.done_init:
-            print("----------")
-            start_clock = rospy.get_time()
-            try:
-                img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-                print("img_cv.shape = ", img_cv.shape)
-                self.list_img_cv[camera_idx] = img_cv
-                self.list_got_new_img = True
-                if all(list_got_new_img):
-                    outputs = self.dnnPrediction(img_cv)
-                    self.inputToMsg(outputs)
-                    self.publication(msg.header.stamp)
-                    print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
-            except CvBridgeError as e:
-                print(e)
+        print("----------")
+        start_clock = rospy.get_time()
+        try:
+            img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            print("img_cv.shape = ", img_cv.shape)
+            self.list_img_cv[camera_idx] = img_cv
+            self.list_got_new_img[camera_idx] = True
+            if all(self.list_got_new_img):
+                outputs = self.dnnPrediction()
+                self.inputToMsg(outputs)
+                self.publication(msg.header.stamp)
+                print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
+        except CvBridgeError as e:
+            print(e)
 
     def dnnPrediction(self):
         ## inference
-        inputs = transformImage()
-        print("input.size = ", inputs.size)
+        inputs = self.transformImage()
+        print("inputs.size() = ", inputs.size())
         outputs = self.net(inputs)
         print("outputs = ", outputs)
         ## reset
@@ -116,7 +113,7 @@ class AttitudeEstimation:
 
     def transformImage(self):
         for i in range(self.num_cameras):
-            img_pil = self.cvToPIL(list_img_cv[i])
+            img_pil = self.cvToPIL(self.list_img_cv[i])
             img_tensor = self.img_transform(img_pil)
             if i == 0:
                 combined_img_tensor = img_tensor
@@ -199,25 +196,8 @@ class AttitudeEstimation:
 def main():
     ## Node
     rospy.init_node('attitude_estimation', anonymous=True)
-    ## Network
-    net = mle_network.OriginalNet()
-    print(net)
-    net.to(device)
-    ## Load weights
-    weights_was_saved_in_same_device = True
-    if weights_was_saved_in_same_device:
-        ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
-        print("Loaded: GPU -> GPU or CPU -> CPU")
-        load_weights = torch.load(weights_path)
-    else:
-        ## saved in GPU -> load in CPU
-        print("Loaded: GPU -> CPU")
-        load_weights = torch.load(weights_path, map_location={"cuda:0": "cpu"})
-    net.load_state_dict(load_weights)
-    ## set as eval
-    net.eval()
 
-    attitude_estimation = AttitudeEstimation(frame_id, device, size, mean, std, net)
+    attitude_estimation = AttitudeEstimation()
 
     rospy.spin()
 

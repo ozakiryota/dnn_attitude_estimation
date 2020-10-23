@@ -12,7 +12,6 @@ class OriginalNet(nn.Module):
         vgg = models.vgg16(pretrained=use_pretrained)
         self.features = vgg.features
         num_fc_in_features = num_images*(resize//32)**2*512
-        print("num_fc_in_features = ", num_fc_in_features)
         self.fc = nn.Sequential(
             nn.Linear(num_fc_in_features, 100),
             nn.ReLU(inplace=True),
