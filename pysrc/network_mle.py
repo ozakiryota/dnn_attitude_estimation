@@ -5,8 +5,6 @@ import torch
 from torchvision import models
 import torch.nn as nn
 
-import data_transform
-
 class OriginalNet(nn.Module):
     def __init__(self):
         super(OriginalNet, self).__init__()
@@ -67,6 +65,7 @@ class OriginalNet(nn.Module):
         return x
 
 ##### test #####
+# import data_transform
 # ## network
 # net = OriginalNet()
 # print(net)
