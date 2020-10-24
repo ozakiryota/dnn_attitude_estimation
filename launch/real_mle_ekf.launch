@@ -1,0 +1,66 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- rosbag -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_133829.bag"/>
+
+	<!-- rviz -->
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/real_mle_ekf.rviz"/>
+
+	<!-- image -->
+	<node pkg="image_transport" type="republish" name="republish_f" args="compressed raw">
+		<remap from="in" to="/realsense_f/color/image_raw"/>
+		<remap from="out" to="/realsense_f/color/image_raw"/>
+	</node>
+	<node pkg="image_transport" type="republish" name="republish_r" args="compressed raw">
+		<remap from="in" to="/realsense_r/color/image_raw"/>
+		<remap from="out" to="/realsense_r/color/image_raw"/>
+	</node>
+	<node pkg="image_transport" type="republish" name="republish_l" args="compressed raw">
+		<remap from="in" to="/realsense_l/color/image_raw"/>
+		<remap from="out" to="/realsense_l/color/image_raw"/>
+	</node>
+	<node pkg="image_transport" type="republish" name="republish_b" args="compressed raw">
+		<remap from="in" to="/realsense_b/color/image_raw"/>
+		<remap from="out" to="/realsense_b/color/image_raw"/>
+	</node>
+
+	<!-- MAIN -->
+	<node pkg="dnn_attitude_estimation" name="mle_ekf" type="mle_ekf" output="screen">
+		<param name="wait_inipose" type="bool" value="false"/>
+		<param name="use_quaternion_for_rotation" type="bool" value="false"/>
+		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
+		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
+		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
+		<!-- <param name="sigma_camera_g" type="double" value="1.0e+4"/> -->
+		<param name="sigma_camera_g" type="double" value="5.0e+3"/>
+		<!-- <param name="th_mul_sigma" type="double" value="8.0e&#45;5"/> -->
+		<param name="th_mul_sigma" type="double" value="1.2e-4"/>
+	</node>
+
+	<!-- comparative approaches -->
+	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
+		<param name="wait_inipose" type="bool" value="false"/>
+	</node>
+
+	<!-- msg conversion -->
+	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
+		<remap from="/quat" to="/ekf/quat_rpy"/>
+		<remap from="/rpy" to="/ekf/rpy"/>
+	</node>
+	<node pkg="msg_conversion" type="odometry_to_rpy" name="gyrodometry_to_rpy">
+		<remap from="/odom" to="/gyrodometry"/>
+		<remap from="/rpy" to="/gyrodometry/rpy"/>
+	</node>
+
+	<!-- validation -->
+	<param name="erase_old_data" type="bool" value="False"/>
+	<param name="/num_sub" type="int" value="2"/>
+	<param name="/method0" type="str" value="Ours"/>
+	<param name="/method1" type="str" value="Gyro"/>
+	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
+		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
+		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
+	</node>
+</launch>
