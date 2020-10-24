@@ -5,6 +5,7 @@
 	<!-- param -->
 	<param name="num_cameras" type="int" value="4"/>
 	<param name="weights_path" type="str" value="$(find dnn_attitude_estimation)/weights/mle4cam.pth"/>
+	<param name="resize" type="int" value="112"/>
 	<!-- MAIN -->
 	<node pkg="dnn_attitude_estimation" name="combine_mle_prediction" type="combine_mle_prediction.py" output="screen">
 		<remap from="/image_raw0" to="/realsense_f/color/image_raw"/>
