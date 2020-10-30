@@ -47,6 +47,13 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: Axes
+      Radius: 0.100000001
+      Reference Frame: <Fixed Frame>
+      Value: true
     - Alpha: 1
       Class: rviz_plugin_tutorials/Imu
       Color: 204; 51; 204
@@ -54,6 +61,15 @@ Visualization Manager:
       History Length: 1
       Name: Imu
       Topic: /imu/data
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Class: rviz_plugin_tutorials/Imu
+      Color: 204; 51; 204
+      Enabled: true
+      History Length: 1
+      Name: dnn_gravity
+      Topic: /dnn/g_vector_with_cov
       Unreliable: false
       Value: true
     - Class: rviz/Image
@@ -107,7 +123,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: imu
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -128,7 +144,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 53.2538109
+      Distance: 6.81472015
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
