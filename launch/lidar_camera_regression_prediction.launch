@@ -1,0 +1,12 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- param -->
+	<param name="weights_path" type="str" value="$(find dnn_attitude_estimation)/weights/regression_lidar_camera.pth"/>
+	<!-- MAIN -->
+	<node pkg="dnn_attitude_estimation" name="lidar_camera_regression_prediction" type="lidar_camera_regression_prediction.py" output="screen">
+		<remap from="/color_image" to="/realsense_f/color/image_raw"/>
+		<remap from="/depth_image" to="/depth_image/64fc1"/>
+	</node>
+</launch>
