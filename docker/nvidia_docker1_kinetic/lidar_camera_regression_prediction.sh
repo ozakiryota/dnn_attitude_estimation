@@ -13,4 +13,8 @@ nvidia-docker run -it --rm \
 	-v $root_path/../../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
 	--env="OMP_NUM_THREADS=1" \
 	$image_name:nvidia_docker1_kinetic \
-	bash -c "source /home/ros_catkin_ws/devel/setup.bash;roslaunch dnn_attitude_estimation lidar_camera_regression_prediction.launch"
+	bash -c "\
+		source /opt/ros/kinetic/setup.bash; \
+		source /home/ros_catkin_ws/devel/setup.bash; \
+		source /home/catkin_build_ws/install/setup.bash --extend; \
+		roslaunch dnn_attitude_estimation lidar_camera_regression_prediction.launch"

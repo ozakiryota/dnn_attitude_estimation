@@ -66,7 +66,7 @@ class AttitudeEstimation:
         return img_transform
 
     def getNetwork(self, resize, weights_path):
-        net = network_mod.Network(resize, dim_fc_out=3, use_pretrained=False)
+        net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=False)
         print(net)
         net.to(self.device)
         net.eval()
@@ -128,6 +128,7 @@ class AttitudeEstimation:
         inputs_color = color_img_tensor.unsqueeze_(0)
         inputs_color = inputs_color.to(self.device)
         ## depth
+        self.depth_img_cv = self.depth_img_cv.astype(np.float32)
         depth_img_tensor = torch.from_numpy(self.depth_img_cv)
         inputs_depth = depth_img_tensor.unsqueeze_(0).unsqueeze_(0)
         inputs_depth = inputs_depth.to(self.device)
