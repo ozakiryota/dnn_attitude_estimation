@@ -28,7 +28,7 @@
 	</node>
 
 	<!-- validation -->
-	<param name="erase_old_data" type="bool" value="False"/>
+	<param name="erase_old_data" type="bool" value="True"/>
 	<param name="/num_sub" type="int" value="2"/>
 	<param name="/method0" type="str" value="Ours"/>
 	<param name="/method1" type="str" value="Gyro"/>

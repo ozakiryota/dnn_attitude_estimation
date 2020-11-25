@@ -3,7 +3,7 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- rosbag -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202011220319.bag"/>
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202011221752.bag"/>
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/lidar_camera_regression_ekf_airsim.rviz"/>
@@ -44,10 +44,17 @@
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<param name="sigma_camera_g" type="double" value="1.0e+1"/>
+		<param name="sigma_camera_g" type="double" value="5.0e+1"/>
 	</node>
 
+	<!-- validation -->
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/validation_airsim.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_airsim.launch"/>
+
 	<!-- visualization -->
-	<include file="$(find dnn_attitude_estimation)/launch/validation_airsim.launch"/>
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_airsim.launch"/> -->
+	<node pkg="msg_conversion" name="vector_to_arrow" type="vector_to_arrow">
+		<remap from="/vector" to="/dnn/g_vector"/>
+		<param name="use_subscribed_frameid" type="bool" value="false"/>
+		<param name="frame_id" type="string" value="/drone"/>
+	</node>
 </launch>

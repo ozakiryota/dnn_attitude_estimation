@@ -27,7 +27,7 @@
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<param name="sigma_camera_g" type="double" value="5.0e+2"/>
+		<param name="sigma_camera_g" type="double" value="5.0e+1"/>
 	</node>
 
 	<!-- comparative approaches -->
@@ -54,5 +54,12 @@
 	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
 		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
+	</node>
+
+	<!-- visualization -->
+	<node pkg="msg_conversion" name="vector_to_arrow" type="vector_to_arrow">
+		<remap from="/vector" to="/dnn/g_vector"/>
+		<param name="use_subscribed_frameid" type="bool" value="false"/>
+		<param name="frame_id" type="string" value="/velodyne"/>
 	</node>
 </launch>
