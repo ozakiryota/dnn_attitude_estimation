@@ -1,0 +1,11 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- param -->
+	<param name="weights_path" type="str" value="$(find dnn_attitude_estimation)/weights/camera_regression.pth"/>
+	<!-- MAIN -->
+	<node pkg="dnn_attitude_estimation" name="camera_regression_inference" type="camera_regression_inference.py" output="screen">
+		<remap from="/image_raw" to="/decompressed_image"/>
+	</node>
+</launch>

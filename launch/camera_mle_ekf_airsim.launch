@@ -30,17 +30,17 @@
 	<node pkg="dnn_attitude_estimation" name="mle_ekf" type="mle_ekf" output="screen">
 		<remap from="/imu/data" to="/imu/data/neu"/>
 		<param name="wait_inipose" type="bool" value="false"/>
-		<param name="use_quaternion_for_rotation" type="bool" value="false"/>
+		<!-- <param name="use_quaternion_for_rotation" type="bool" value="false"/> -->
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<!-- <param name="sigma_camera_g" type="double" value="1.0e+4"/> -->
-		<param name="sigma_camera_g" type="double" value="5.0e+3"/>
+		<!-- <param name="sigma_dnn" type="double" value="1.0e+4"/> -->
+		<param name="sigma_dnn" type="double" value="5.0e+3"/>
 		<!-- <param name="th_mul_sigma" type="double" value="8.0e&#45;5"/> -->
 		<param name="th_mul_sigma" type="double" value="1.2e-4"/>
 	</node>
 
 	<!-- visualization -->
-	<include file="$(find dnn_attitude_estimation)/launch/validation.launch"/>
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_airsim.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_airsim.launch"/> -->
 </launch>

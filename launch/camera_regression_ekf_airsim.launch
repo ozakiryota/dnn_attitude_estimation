@@ -33,10 +33,10 @@
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
-		<param name="sigma_camera_g" type="double" value="1.0e+1"/>
+		<param name="sigma_dnn" type="double" value="1.0e+1"/>
 	</node>
 
 	<!-- visualization -->
-	<include file="$(find dnn_attitude_estimation)/launch/validation.launch"/>
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_airsim.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_airsim.launch"/> -->
 </launch>

@@ -3,7 +3,7 @@
 import rospy
 from sensor_msgs.msg import Image as ImageMsg
 from geometry_msgs.msg import Vector3Stamped
-from geometry_msgs.msg import QuaternionStamped
+from sensor_msgs.msg import Imu
 
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -16,16 +16,18 @@ from torchvision import models
 import torch.nn as nn
 from torchvision import transforms
 
-import regression_network
+import network_mod
 
 class AttitudeEstimation:
     def __init__(self, frame_id, device, size, mean, std, net):
         ## subscriber
-        self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage)
+        self.sub_imgae = rospy.Subscriber("/image_raw", ImageMsg, self.callbackImage, queue_size=1, buff_size=2**24)
         ## publisher
         self.pub_vector = rospy.Publisher("/dnn/g_vector", Vector3Stamped, queue_size=1)
+        self.pub_accel = rospy.Publisher("/dnn/g_vector_with_cov", Imu, queue_size=1)
         ## msg
         self.v_msg = Vector3Stamped()
+        self.accel_msg = Imu()
         ## cv_bridge
         self.bridge = CvBridge()
         ## copy arguments
@@ -67,24 +69,74 @@ class AttitudeEstimation:
         return img_pil
 
     def inputMsg(self, outputs):
+        ## get covariance matrix
+        cov = self.getCovMatrix(outputs)
         ## tensor to numpy
         outputs = outputs[0].cpu().detach().numpy()
+        cov = cov[0].cpu().detach().numpy()
         ## Vector3Stamped
         self.v_msg.vector.x = -outputs[0]
         self.v_msg.vector.y = -outputs[1]
         self.v_msg.vector.z = -outputs[2]
+        ## Imu
+        self.inputNanToImuMsg(self.accel_msg)
+        self.accel_msg.linear_acceleration.x = -outputs[0]
+        self.accel_msg.linear_acceleration.y = -outputs[1]
+        self.accel_msg.linear_acceleration.z = -outputs[2]
+        for i in range(cov.size):
+            self.accel_msg.linear_acceleration_covariance[i] = cov[i//3, i%3]
+        ## print
+        print("cov = ", cov)
+
+    def getCovMatrix(self, outputs):
+        L = self.getTriangularMatrix(outputs)
+        Ltrans = torch.transpose(L, 1, 2)
+        LL = torch.bmm(L, Ltrans)
+        return LL
+
+    def getTriangularMatrix(self, outputs):
+        elements = outputs[:, 3:9]
+        L = torch.zeros(outputs.size(0), elements.size(1)//2, elements.size(1)//2)
+        L[:, 0, 0] = torch.exp(elements[:, 0])
+        L[:, 1, 0] = elements[:, 1]
+        L[:, 1, 1] = torch.exp(elements[:, 2])
+        L[:, 2, 0] = elements[:, 3]
+        L[:, 2, 1] = elements[:, 4]
+        L[:, 2, 2] = torch.exp(elements[:, 5])
+        return L
+
+    def inputNanToImuMsg(self, imu):
+        imu.orientation.x = math.nan
+        imu.orientation.y = math.nan
+        imu.orientation.z = math.nan
+        imu.orientation.w = math.nan
+        imu.angular_velocity.x = math.nan
+        imu.angular_velocity.y = math.nan
+        imu.angular_velocity.z = math.nan
+        imu.linear_acceleration.x = math.nan
+        imu.linear_acceleration.y = math.nan
+        imu.linear_acceleration.z = math.nan
+        for i in range(len(imu.linear_acceleration_covariance)):
+            imu.orientation_covariance[i] = math.nan
+            imu.angular_velocity_covariance[i] = math.nan
+            imu.linear_acceleration_covariance[i] = math.nan
 
     def publication(self, stamp):
+        print("delay[s]: ", (rospy.Time.now() - stamp).to_sec())
         ## Vector3Stamped
         self.v_msg.header.stamp = stamp
         self.v_msg.header.frame_id = self.frame_id
         self.pub_vector.publish(self.v_msg)
+        ## Imu
+        self.accel_msg.header.stamp = stamp
+        self.accel_msg.header.frame_id = self.frame_id
+        self.pub_accel.publish(self.accel_msg)
 
 def main():
     ## Node
     rospy.init_node('attitude_estimation', anonymous=True)
     ## Param
-    weights_path = rospy.get_param("/weights_path", "../../weights/regression.pth")
+    weights_path = rospy.get_param("/weights_path", "../../weights/mle.pth")
     print("weights_path = ", weights_path)
     frame_id = rospy.get_param("/frame_id", "/base_link")
     print("frame_id = ", frame_id)
@@ -98,7 +150,7 @@ def main():
     mean = ([0.5, 0.5, 0.5])
     std = ([0.5, 0.5, 0.5])
     ## Network
-    net = regression_network.OriginalNet()
+    net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=False)
     print(net)
     net.to(device)
     ## Load weights

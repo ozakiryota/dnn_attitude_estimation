@@ -38,7 +38,7 @@ class DnnAttitudeEstimationEkf{
 		std::string _frame_id;
 		double _sigma_ini;
 		double _sigma_imu;
-		double _sigma_camera_g;
+		double _sigma_dnn;
 		double _th_mul_sigma;
 		/*counter*/
 		int _counter_camera_g = 0;
@@ -76,8 +76,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_sigma_ini = " << _sigma_ini << std::endl;
 	_nhPrivate.param("sigma_imu", _sigma_imu, 1.0e-4);
 	std::cout << "_sigma_imu = " << _sigma_imu << std::endl;
-	_nhPrivate.param("sigma_camera_g", _sigma_camera_g, 1.0e+0);
-	std::cout << "_sigma_camera_g = " << _sigma_camera_g << std::endl;
+	_nhPrivate.param("sigma_dnn", _sigma_dnn, 1.0e+0);
+	std::cout << "_sigma_dnn = " << _sigma_dnn << std::endl;
 	_nhPrivate.param("th_mul_sigma", _th_mul_sigma, 5.0e-4);
 	std::cout << "_th_mul_sigma = " << _th_mul_sigma << std::endl;
 	/*sub*/
@@ -164,7 +164,7 @@ void DnnAttitudeEstimationEkf::callbackCameraG(const sensor_msgs::ImuConstPtr& m
 	/*judge*/
 	if(varIsSmallEnough(*msg)){
 		/*observation*/
-		observationG(*msg, _sigma_camera_g);
+		observationG(*msg, _sigma_dnn);
 		/*publication*/
 		publication(msg->header.stamp);
 	}

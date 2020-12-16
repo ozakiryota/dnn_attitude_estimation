@@ -37,7 +37,7 @@ class DnnAttitudeEstimationEkf{
 		std::string _frame_id;
 		double _sigma_ini;
 		double _sigma_imu;
-		double _sigma_camera_g;
+		double _sigma_dnn;
 
 	public:
 		DnnAttitudeEstimationEkf();
@@ -68,8 +68,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_sigma_ini = " << _sigma_ini << std::endl;
 	_nhPrivate.param("sigma_imu", _sigma_imu, 1.0e-4);
 	std::cout << "_sigma_imu = " << _sigma_imu << std::endl;
-	_nhPrivate.param("sigma_camera_g", _sigma_camera_g, 1.0e-1);
-	std::cout << "_sigma_camera_g = " << _sigma_camera_g << std::endl;
+	_nhPrivate.param("sigma_dnn", _sigma_dnn, 1.0e-1);
+	std::cout << "_sigma_dnn = " << _sigma_dnn << std::endl;
 	/*sub*/
 	_sub_inipose = _nh.subscribe("/initial_orientation", 1, &DnnAttitudeEstimationEkf::callbackIniPose, this);
 	_sub_imu = _nh.subscribe("/imu/data", 1, &DnnAttitudeEstimationEkf::callbackIMU, this);
@@ -156,7 +156,7 @@ void DnnAttitudeEstimationEkf::callbackCameraG(const geometry_msgs::Vector3Stamp
 	/*wait initial orientation*/
 	if(!_got_inipose)	return;
 	/*observation*/
-	observationG(*msg, _sigma_camera_g);
+	observationG(*msg, _sigma_dnn);
 	/*publication*/
 	publication(msg->header.stamp);
 }

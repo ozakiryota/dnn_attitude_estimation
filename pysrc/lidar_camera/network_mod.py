@@ -41,42 +41,10 @@ class Network(nn.Module):
             nn.Linear(18, dim_fc_out)
         )
 
-        # self.initializeWeights()
-
-    def initializeWeights(self):
-        for m in self.depth_cnn.children():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight)
-        for m in self.fc.children():
-            if isinstance(m, nn.Linear):
-                nn.init.kaiming_normal_(m.weight)
-
-    def getParamValueList(self):
-        list_colorcnn_param_value = []
-        list_depthcnn_param_value = []
-        list_fc_param_value = []
-        for param_name, param_value in self.named_parameters():
-            param_value.requires_grad = True
-            if "color_cnn" in param_name:
-                # print("color_cnn: ", param_name)
-                list_colorcnn_param_value.append(param_value)
-            if "depth_cnn" in param_name:
-                # print("depth_cnn: ", param_name)
-                list_depthcnn_param_value.append(param_value)
-            if "fc" in param_name:
-                # print("fc: ", param_name)
-                list_fc_param_value.append(param_value)
-        # print("list_colorcnn_param_value: ",list_colorcnn_param_value)
-        # print("list_depthcnn_param_value: ",list_depthcnn_param_value)
-        # print("list_fc_param_value: ",list_fc_param_value)
-        return list_colorcnn_param_value, list_depthcnn_param_value, list_fc_param_value
-
     def forward(self, inputs_color, inputs_depth):
         ## cnn
         features_color = self.color_cnn(inputs_color)
         features_depth = self.depth_cnn(inputs_depth)
-        # print("out_color_cnn: ", features_color.size())
-        # print("out_depth_cnn: ", features_depth.size())
         ## concat
         features_color = torch.flatten(features_color, 1)
         features_depth = torch.flatten(features_depth, 1)
@@ -86,37 +54,3 @@ class Network(nn.Module):
         l2norm = torch.norm(outputs[:, :3].clone(), p=2, dim=1, keepdim=True)
         outputs[:, :3] = torch.div(outputs[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
         return outputs
-
-##### test #####
-# import data_transform_mod
-# ## color image
-# color_img_path = "../../../dataset_image_to_gravity/AirSim/example/camera_0.jpg"
-# color_img_pil = Image.open(color_img_path)
-# ## depth image
-# depth_img_path = "../../../dataset_image_to_gravity/AirSim/example/lidar.npy"
-# depth_img_numpy = np.load(depth_img_path)
-# ## label
-# acc_list = [0, 0, 1]
-# acc_numpy = np.array(acc_list)
-# ## trans param
-# resize = 224
-# mean = ([0.5, 0.5, 0.5])
-# std = ([0.5, 0.5, 0.5])
-# ## transform
-# transform = data_transform_mod.DataTransform(resize, mean, std)
-# color_img_trans, depth_img_trans, _ = transform(color_img_pil, depth_img_numpy, acc_numpy, phase="train")
-# ## network
-# net = Network(resize, dim_fc_out=3, use_pretrained_vgg=True)
-# print(net)
-# list_colorcnn_param_value, list_depthcnn_param_value, list_fc_param_value = net.getParamValueList()
-# print("len(list_colorcnn_param_value) = ", len(list_colorcnn_param_value))
-# print("len(list_depthcnn_param_value) = ", len(list_depthcnn_param_value))
-# print("len(list_fc_param_value) = ", len(list_fc_param_value))
-# ## prediction
-# inputs_color = color_img_trans.unsqueeze_(0)
-# inputs_depth = depth_img_trans.unsqueeze_(0)
-# print("inputs_color.size() = ", inputs_color.size())
-# print("inputs_depth.size() = ", inputs_depth.size())
-# outputs = net(inputs_color, inputs_depth)
-# print("outputs.size() = ", outputs.size())
-# print("outputs = ", outputs)

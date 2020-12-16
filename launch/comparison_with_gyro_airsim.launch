@@ -2,7 +2,7 @@
 	<!-- global rosparam -->
 	<param name="use_sim_time" value="true"/>
 
-	<!-- comparative approaches -->
+	<!-- compared methods -->
 	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
 		<remap from="/odom" to="/odom/neu"/>
 		<remap from="/imu/data" to="/imu/data/neu"/>
