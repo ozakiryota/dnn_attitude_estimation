@@ -38,14 +38,14 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /airsim_node/drone/camera_0/Scene
+      Image Topic: /decompressed_image
       Max Value: 1
       Median window: 5
       Min Value: 0
       Name: Image
       Normalize Range: true
       Queue Size: 2
-      Transport Hint: compressed
+      Transport Hint: raw
       Unreliable: false
       Value: true
     - Class: rviz/Marker
@@ -59,7 +59,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: drone
+    Fixed Frame: imu
     Frame Rate: 30
   Name: root
   Tools:

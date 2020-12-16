@@ -6,7 +6,7 @@
 	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/dynamic/dkan_outdoor/20201027_143715.bag"/>
 
 	<!-- rviz -->
-	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/lidar_camera_regression_ekf_real.rviz"/>
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/lidar_camera_real.rviz"/>
 
 	<!-- image -->
 	<node pkg="image_transport" type="republish" name="republish_f" args="compressed raw">
@@ -30,36 +30,10 @@
 		<param name="sigma_camera_g" type="double" value="5.0e+1"/>
 	</node>
 
-	<!-- comparative approaches -->
-	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
-		<param name="wait_inipose" type="bool" value="false"/>
-	</node>
+	<!-- evaluation -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/> -->
 
-	<!-- msg conversion -->
-	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
-		<remap from="/quat" to="/ekf/quat_rpy"/>
-		<remap from="/rpy" to="/ekf/rpy"/>
-	</node>
-	<node pkg="msg_conversion" type="odometry_to_rpy" name="gyrodometry_to_rpy">
-		<remap from="/odom" to="/gyrodometry"/>
-		<remap from="/rpy" to="/gyrodometry/rpy"/>
-	</node>
-
-	<!-- validation -->
-	<param name="erase_old_data" type="bool" value="True"/>
-	<param name="save_csv" type="bool" value="False"/>
-	<param name="/num_sub" type="int" value="2"/>
-	<param name="/method0" type="str" value="Ours"/>
-	<param name="/method1" type="str" value="Gyro"/>
-	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
-		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
-		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
-	</node>
-
-	<!-- visualization -->
-	<node pkg="msg_conversion" name="vector_to_arrow" type="vector_to_arrow">
-		<remap from="/vector" to="/dnn/g_vector"/>
-		<param name="use_subscribed_frameid" type="bool" value="false"/>
-		<param name="frame_id" type="string" value="/velodyne"/>
-	</node>
+	<!-- for visualization -->
+	<node pkg="tf" type="static_transform_publisher" name="tf_imu_to_velodyne" args="0 0 0 0 0 0 /imu /velodyne 1" />
 </launch>
