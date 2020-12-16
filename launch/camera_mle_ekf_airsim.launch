@@ -9,7 +9,7 @@
 	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202009041502.bag"/> -->
 
 	<!-- rviz -->
-	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/camera_airsim.rviz"/>
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/camera.rviz"/>
 
 	<!-- image -->
 	<node pkg="image_transport" type="republish" name="republish" args="compressed raw">

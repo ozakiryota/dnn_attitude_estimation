@@ -8,9 +8,9 @@
 	<param name="resize" type="int" value="112"/>
 	<!-- MAIN -->
 	<node pkg="dnn_attitude_estimation" name="combine_mle_prediction" type="combine_mle_prediction.py" output="screen">
-		<remap from="/image_raw0" to="/realsense_f/color/image_raw"/>
-		<remap from="/image_raw1" to="/realsense_l/color/image_raw"/>
-		<remap from="/image_raw2" to="/realsense_b/color/image_raw"/>
-		<remap from="/image_raw3" to="/realsense_r/color/image_raw"/>
+		<remap from="/image_raw0" to="/camera_f/decompressed_image"/>
+		<remap from="/image_raw1" to="/camera_l/decompressed_image"/>
+		<remap from="/image_raw2" to="/camera_b/decompressed_image"/>
+		<remap from="/image_raw3" to="/camera_r/decompressed_image"/>
 	</node>
 </launch>
