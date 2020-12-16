@@ -17,4 +17,4 @@ nvidia-docker run -it --rm \
 		source /opt/ros/kinetic/setup.bash; \
 		source /home/ros_catkin_ws/devel/setup.bash; \
 		source /home/catkin_build_ws/install/setup.bash --extend; \
-		roslaunch dnn_attitude_estimation lidar_camera_regression_prediction.launch"
+		roslaunch dnn_attitude_estimation lidar_camera_regression_inference.launch"

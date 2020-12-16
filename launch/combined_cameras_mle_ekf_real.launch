@@ -3,7 +3,8 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- rosbag -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_160325.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_160325.bag"/> -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/with_vicon/20201213_183636.bag"/>
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/combined_cameras.rviz"/>
@@ -19,7 +20,7 @@
 	</node>
 	<node pkg="image_transport" type="republish" name="republish_b" args="compressed raw">
 		<remap from="in" to="/realsense_b/color/image_raw"/>
-		<remap from="out" to="/camera_b/color/image_raw"/>
+		<remap from="out" to="/camera_b/decompressed_image"/>
 	</node>
 	<node pkg="image_transport" type="republish" name="republish_r" args="compressed raw">
 		<remap from="in" to="/realsense_r/color/image_raw"/>
@@ -38,5 +39,6 @@
 	</node>
 
 	<!-- evaluation -->
-	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/>
 </launch>

@@ -59,7 +59,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: drone
+    Fixed Frame: imu
     Frame Rate: 30
   Name: root
   Tools:

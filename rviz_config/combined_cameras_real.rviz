@@ -62,7 +62,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera_b/color/image_raw
+      Image Topic: /camera_b/decompressed_image
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -89,13 +89,13 @@ Visualization Manager:
       Marker Topic: /vis/arrow
       Name: Marker
       Namespaces:
-        {}
+        arrow: true
       Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: base_link
+    Fixed Frame: imu
     Frame Rate: 30
   Name: root
   Tools:

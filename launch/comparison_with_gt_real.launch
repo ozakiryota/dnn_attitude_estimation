@@ -8,6 +8,19 @@
 	</node>
 
 	<!-- msg conversion -->
+	<node pkg="msg_conversion" type="tf_to_posestamped" name="tf_to_posestamped">
+		<param name="parent_frame_id" type="string" value="/world"/>
+		<param name="child_frame_id" type="string" value="/vicon/sensors/sensors"/>
+	</node>
+	<node pkg="msg_conversion" type="posestamped_reset_origin" name="posestamped_reset_origin">
+		<remap from="/pose" to="/tf_to_posestamped"/>
+		<param name="parent_frame_id" type="string" value="/world"/>
+		<param name="child_frame_id" type="string" value="/tf_to_posestamped/reset"/>
+	</node>
+	<node pkg="msg_conversion" name="posestamped_to_rpy" type="posestamped_to_rpy">
+		<remap from="/pose" to="/pose/reset_origin"/>
+		<remap from="/rpy" to="/gt/rpy"/>
+	</node>
 	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
 		<remap from="/quat" to="/ekf/quat_rpy"/>
 		<remap from="/rpy" to="/ekf/rpy"/>
@@ -23,7 +36,8 @@
 	<param name="/num_sub" type="int" value="2"/>
 	<param name="/method0" type="str" value="Ours"/>
 	<param name="/method1" type="str" value="Gyro"/>
-	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
+	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
+		<remap from="/truth/rpy" to="/gt/rpy"/>
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
 		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
 	</node>
