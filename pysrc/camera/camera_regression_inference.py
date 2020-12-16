@@ -98,7 +98,7 @@ def main():
     mean = ([0.5, 0.5, 0.5])
     std = ([0.5, 0.5, 0.5])
     ## Network
-    net = network_mod.Network(resize, dim_fc_out=9, use_pretrained_vgg=False)
+    net = network_mod.Network(size, dim_fc_out=3, use_pretrained_vgg=False)
     print(net)
     net.to(device)
     ## Load weights

@@ -2,22 +2,12 @@
 	<!-- global rosparam -->
 	<param name="use_sim_time" value="true"/>
 
-	<!-- compared methods -->
+	<!-- compared approaches -->
 	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/imu/data" to="/imu/data/neu"/>
 		<param name="wait_inipose" type="bool" value="false"/>
 	</node>
 
 	<!-- msg conversion -->
-	<!-- <node pkg="msg_conversion" name="combine_orientation_linear" type="combine_orientation_linear"> -->
-	<!-- 	<remap from="/odom" to="/odom/neu"/> -->
-	<!-- 	<remap from="/orientation" to="/ekf/quat_rpy"/> -->
-	<!-- </node> -->
-	<node pkg="msg_conversion" name="odometry_to_rpy" type="odometry_to_rpy">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/rpy" to="/gt/rpy"/>
-	</node>
 	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
 		<remap from="/quat" to="/ekf/quat_rpy"/>
 		<remap from="/rpy" to="/ekf/rpy"/>
@@ -29,11 +19,11 @@
 
 	<!-- evaluation -->
 	<param name="erase_old_data" type="bool" value="True"/>
+	<param name="save_csv" type="bool" value="False"/>
 	<param name="/num_sub" type="int" value="2"/>
 	<param name="/method0" type="str" value="Ours"/>
 	<param name="/method1" type="str" value="Gyro"/>
-	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
-		<remap from="/truth/rpy" to="/gt/rpy"/>
+	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
 		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
 	</node>
