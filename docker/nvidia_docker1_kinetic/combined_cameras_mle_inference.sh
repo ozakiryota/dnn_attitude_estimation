@@ -13,4 +13,8 @@ nvidia-docker run -it --rm \
 	-v $root_path/../../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
 	--env="OMP_NUM_THREADS=1" \
 	$image_name:nvidia_docker1_kinetic \
-	/bin/bash /home/combine_mle_prediction.sh
+	bash -c "\
+		source /opt/ros/kinetic/setup.bash; \
+		source /home/ros_catkin_ws/devel/setup.bash; \
+		source /home/catkin_build_ws/install/setup.bash --extend; \
+		roslaunch dnn_attitude_estimation combined_cameras_mle_inference.launch"

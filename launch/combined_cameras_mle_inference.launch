@@ -7,7 +7,7 @@
 	<param name="weights_path" type="str" value="$(find dnn_attitude_estimation)/weights/combined_cameras_mle.pth"/>
 	<param name="resize" type="int" value="112"/>
 	<!-- MAIN -->
-	<node pkg="dnn_attitude_estimation" name="combine_mle_prediction" type="combine_mle_prediction.py" output="screen">
+	<node pkg="dnn_attitude_estimation" name="combined_cameras_mle_inference" type="combined_cameras_mle_inference.py" output="screen">
 		<remap from="/image_raw0" to="/camera_f/decompressed_image"/>
 		<remap from="/image_raw1" to="/camera_l/decompressed_image"/>
 		<remap from="/image_raw2" to="/camera_b/decompressed_image"/>
