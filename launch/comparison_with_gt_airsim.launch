@@ -18,6 +18,7 @@
 
 	<!-- validation -->
 	<param name="erase_old_data" type="bool" value="False"/>
+	<param name="save_csv" type="bool" value="False"/>
 	<param name="/num_sub" type="int" value="1"/>
 	<param name="/method0" type="str" value="Ours"/>
 	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">

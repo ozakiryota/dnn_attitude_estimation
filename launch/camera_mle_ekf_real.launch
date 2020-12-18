@@ -3,8 +3,8 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- rosbag -->
-	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_160325.bag"/> -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/with_vicon/20201213_183636.bag"/>
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_160325.bag"/>
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/with_vicon/20201213_183636.bag"/> -->
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/camera_real.rviz"/>
@@ -23,10 +23,11 @@
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
 		<param name="sigma_dnn" type="double" value="5.0e+3"/>
-		<param name="th_mul_sigma" type="double" value="3.1473092356350454e-05"/>
+		<!-- <param name="th_mul_sigma" type="double" value="3.1473092356350454e&#45;05"/> -->
+		<param name="th_mul_sigma" type="double" value="1.2e-4"/>
 	</node>
 
 	<!-- evaluation -->
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/> -->
-	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/>
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/>
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/> -->
 </launch>

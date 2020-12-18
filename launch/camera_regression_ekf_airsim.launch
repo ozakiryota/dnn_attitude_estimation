@@ -37,6 +37,6 @@
 	</node>
 
 	<!-- visualization -->
-	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_airsim.launch"/>
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_airsim.launch"/> -->
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_airsim.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_airsim.launch"/>
 </launch>
