@@ -17,12 +17,21 @@
 	</node>
 
 	<!-- validation -->
-	<param name="erase_old_data" type="bool" value="False"/>
-	<param name="save_csv" type="bool" value="False"/>
+	<param name="erase_old_data" type="bool" value="True"/>
+	<param name="save_csv" type="bool" value="True"/>
 	<param name="/num_sub" type="int" value="1"/>
 	<param name="/method0" type="str" value="Ours"/>
 	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
 		<remap from="/truth/rpy" to="/gt/rpy"/>
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
+	</node>
+
+	<!-- visualization -->
+	<node pkg="msg_conversion" name="vector_to_arrow" type="vector_to_arrow">
+		<remap from="/vector" to="/dnn/g_vector"/>
+		<param name="use_subscribed_frameid" type="bool" value="false"/>
+		<param name="frame_id" type="string" value="/drone"/>
+		<param name="shaft_length" type="double" value="5.0"/>
+		<param name="shaft_diameter" type="double" value="0.5"/>
 	</node>
 </launch>
