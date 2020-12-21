@@ -1,0 +1,17 @@
+<launch>
+	<!-- global rosparam -->
+	<param name="use_sim_time" value="true"/>
+
+	<!-- visualization -->
+	<node pkg="msg_conversion" name="vector_to_arrow" type="vector_to_arrow">
+		<remap from="/vector" to="/dnn/g_vector"/>
+		<param name="use_subscribed_frameid" type="bool" value="false"/>
+		<param name="frame_id" type="string" value="/imu"/>
+		<param name="shaft_length" type="double" value="5.0"/>
+		<param name="shaft_diameter" type="double" value="0.5"/>
+	</node>
+	<node pkg="msg_printer" name="visualize_subscribed_text_rviz" type="visualize_subscribed_text_rviz">
+		<param name="frame_id" type="string" value="/imu"/>
+		<param name="position_z" type="double" value="-6.0"/>
+	</node>
+</launch>

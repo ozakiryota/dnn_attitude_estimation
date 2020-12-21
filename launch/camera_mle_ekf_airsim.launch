@@ -5,8 +5,8 @@
 	<!-- rosbag -->
 	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_202008020251.bag"/> -->
 	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202008290246.bag"/> -->
-	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202009011526.bag"/>
-	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202009041502.bag"/> -->
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/airsim/Neighborhood/drone_1cam_lidar_noisedimu_202009011526.bag"/> -->
+	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/airsim/SoccerField/drone_1cam_lidar_noisedimu_202009041502.bag"/>
 
 	<!-- rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dnn_attitude_estimation)/rviz_config/camera_airsim.rviz"/>
@@ -36,10 +36,13 @@
 		<!-- <param name="sigma_dnn" type="double" value="1.0e+4"/> -->
 		<param name="sigma_dnn" type="double" value="5.0e+3"/>
 		<!-- <param name="th_mul_sigma" type="double" value="8.0e&#45;5"/> -->
-		<param name="th_mul_sigma" type="double" value="1.2e-4"/>
+		<param name="th_mul_sigma" type="double" value="3.2e-4"/>
 	</node>
 
 	<!-- evaluation -->
 	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_airsim.launch"/> -->
 	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_airsim.launch"/>
+
+	<!-- visualization -->
+	<include file="$(find dnn_attitude_estimation)/launch/visualize_marker_airsim.launch"/>
 </launch>
