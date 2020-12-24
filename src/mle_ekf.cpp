@@ -37,9 +37,11 @@ class DnnAttitudeEstimationEkf{
 		/*parameter*/
 		bool _wait_inipose;
 		bool _use_quaternion_for_rotation;
+		bool _observe_imu_acc;
 		std::string _frame_id;
 		double _sigma_ini;
-		double _sigma_imu;
+		double _sigma_gyro;
+		double _sigma_acc;
 		double _sigma_dnn;
 		double _th_mul_sigma;
 		/*counter*/
@@ -72,12 +74,16 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_wait_inipose = " << (bool)_wait_inipose << std::endl;
 	_nhPrivate.param("use_quaternion_for_rotation", _use_quaternion_for_rotation, false);
 	std::cout << "_use_quaternion_for_rotation = " << (bool)_use_quaternion_for_rotation << std::endl;
+	_nhPrivate.param("observe_imu_acc", _observe_imu_acc, false);
+	std::cout << "_observe_imu_acc = " << (bool)_observe_imu_acc << std::endl;
 	_nhPrivate.param("frame_id", _frame_id, std::string("/base_link"));
 	std::cout << "_frame_id = " << _frame_id << std::endl;
 	_nhPrivate.param("sigma_ini", _sigma_ini, 1.0e-10);
 	std::cout << "_sigma_ini = " << _sigma_ini << std::endl;
-	_nhPrivate.param("sigma_imu", _sigma_imu, 1.0e-4);
-	std::cout << "_sigma_imu = " << _sigma_imu << std::endl;
+	_nhPrivate.param("sigma_gyro", _sigma_gyro, 1.0e-4);
+	std::cout << "_sigma_gyro = " << _sigma_gyro << std::endl;
+	_nhPrivate.param("sigma_acc", _sigma_acc, 1.0e+3);
+	std::cout << "_sigma_acc = " << _sigma_acc << std::endl;
 	_nhPrivate.param("sigma_dnn", _sigma_dnn, 1.0e+0);
 	std::cout << "_sigma_dnn = " << _sigma_dnn << std::endl;
 	_nhPrivate.param("th_mul_sigma", _th_mul_sigma, 5.0e-4);
@@ -143,13 +149,18 @@ void DnnAttitudeEstimationEkf::callbackIMU(const sensor_msgs::ImuConstPtr& msg)
 	if(!_use_quaternion_for_rotation)	estimateYaw(*msg, dt);
 	/*prediction*/
 	predictionIMU(*msg, dt);
+	/*observation*/
+	if(_observe_imu_acc){
+		sensor_msgs::Imu imu_inv = *msg;
+		imu_inv.linear_acceleration.x *= -1;
+		imu_inv.linear_acceleration.y *= -1;
+		imu_inv.linear_acceleration.z *= -1;
+		observationG(imu_inv, _sigma_acc);
+	}
 	/*publication*/
 	publication(msg->header.stamp);
 	/*reset*/
 	_stamp_imu_last = msg->header.stamp;
-
-	/*test*/
-	//observationG(*msg, 1.0e+3);
 }
 
 void DnnAttitudeEstimationEkf::callbackBias(const sensor_msgs::ImuConstPtr& msg)
@@ -218,7 +229,7 @@ void DnnAttitudeEstimationEkf::predictionIMU(sensor_msgs::Imu imu, double dt)
 	jF(1, 0) = -u(1)*sin(_x(0)) - u(2)*cos(_x(0));
 	jF(1, 1) = 1;
 	/*Q*/
-	Eigen::MatrixXd Q = _sigma_imu*Eigen::MatrixXd::Identity(_x.size(), _x.size());
+	Eigen::MatrixXd Q = _sigma_gyro*Eigen::MatrixXd::Identity(_x.size(), _x.size());
 	/*Update*/
 	_x = f;
 	_P = jF*_P*jF.transpose() + Q;

@@ -3,9 +3,9 @@
 	<param name="use_sim_time" value="true"/>
 
 	<!-- compared approaches -->
-	<node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d">
-		<param name="wait_inipose" type="bool" value="false"/>
-	</node>
+	<!-- <node pkg="gyrodometry" name="gyrodometry3d" type="gyrodometry3d"> -->
+	<!-- 	<param name="wait_inipose" type="bool" value="false"/> -->
+	<!-- </node> -->
 
 	<!-- msg conversion -->
 	<node pkg="msg_conversion" type="tf_to_posestamped" name="tf_to_posestamped">
@@ -25,20 +25,26 @@
 		<remap from="/quat" to="/ekf/quat_rpy"/>
 		<remap from="/rpy" to="/ekf/rpy"/>
 	</node>
-	<node pkg="msg_conversion" type="odometry_to_rpy" name="gyrodometry_to_rpy">
-		<remap from="/odom" to="/gyrodometry"/>
-		<remap from="/rpy" to="/gyrodometry/rpy"/>
-	</node>
+	<!-- <node pkg="msg_conversion" type="gravity_to_rpy" name="gravity_to_rpy"> -->
+	<!-- 	<remap from="/gravity" to="/dnn/g_vector"/> -->
+	<!-- 	<remap from="/rpy" to="/dnn/rpy"/> -->
+	<!-- </node> -->
+	<!-- <node pkg="msg_conversion" type="odometry_to_rpy" name="gyrodometry_to_rpy"> -->
+	<!-- 	<remap from="/odom" to="/gyrodometry"/> -->
+	<!-- 	<remap from="/rpy" to="/gyrodometry/rpy"/> -->
+	<!-- </node> -->
 
 	<!-- evaluation -->
 	<param name="erase_old_data" type="bool" value="True"/>
 	<param name="save_csv" type="bool" value="True"/>
-	<param name="/num_sub" type="int" value="2"/>
-	<param name="/method0" type="str" value="Ours"/>
-	<param name="/method1" type="str" value="Gyro"/>
+	<param name="/num_sub" type="int" value="1"/>
+	<param name="/method0" type="str" value="Gyro+Acc+DNN"/>
+	<!-- <param name="/method1" type="str" value="DNN"/> -->
+	<!-- <param name="/method2" type="str" value="Gyro"/> -->
 	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
 		<remap from="/truth/rpy" to="/gt/rpy"/>
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
-		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
+		<!-- <remap from="/estimation1/rpy" to="/dnn/rpy"/> -->
+		<!-- <remap from="/estimation2/rpy" to="/gyrodometry/rpy"/> -->
 	</node>
 </launch>

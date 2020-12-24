@@ -19,14 +19,16 @@
 	<node pkg="dnn_attitude_estimation" name="regression_ekf" type="regression_ekf" output="screen">
 		<param name="wait_inipose" type="bool" value="false"/>
 		<!-- <param name="use_quaternion_for_rotation" type="bool" value="false"/> -->
+		<!-- <param name="observe_imu_acc" type="bool" value="false"/> -->
 		<!-- <param name="frame_id" type="string" value="/base_link"/> -->
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
-		<!-- <param name="sigma_imu" type="double" value="1.0e&#45;4"/> -->
+		<!-- <param name="sigma_gyro" type="double" value="1.0e&#45;4"/> -->
+		<!-- <param name="sigma_acc" type="double" value="1.0e+1"/> -->
 		<param name="sigma_dnn" type="double" value="1.0e+1"/>
 	</node>
 
 	<!-- evaluation -->
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/> -->
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_imu_real.launch"/> -->
 	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/>
 
 	<!-- visualization -->

@@ -14,27 +14,35 @@
 	<!-- 	<remap from="/odom" to="/odom/neu"/> -->
 	<!-- 	<remap from="/orientation" to="/ekf/quat_rpy"/> -->
 	<!-- </node> -->
-	<node pkg="msg_conversion" name="odometry_to_rpy" type="odometry_to_rpy">
-		<remap from="/odom" to="/odom/neu"/>
-		<remap from="/rpy" to="/gt/rpy"/>
-	</node>
 	<node pkg="msg_conversion" name="quatstamped_to_rpy" type="quatstamped_to_rpy">
 		<remap from="/quat" to="/ekf/quat_rpy"/>
 		<remap from="/rpy" to="/ekf/rpy"/>
+	</node>
+	<node pkg="msg_conversion" type="gravity_to_rpy" name="gravity_to_rpy">
+		<remap from="/gravity" to="/dnn/g_vector"/>
+		<remap from="/rpy" to="/dnn/rpy"/>
 	</node>
 	<node pkg="msg_conversion" type="odometry_to_rpy" name="gyrodometry_to_rpy">
 		<remap from="/odom" to="/gyrodometry"/>
 		<remap from="/rpy" to="/gyrodometry/rpy"/>
 	</node>
+	<node pkg="msg_conversion" type="imu_to_rpy" name="imu_to_rpy">
+		<remap from="/imu/data" to="/imu/data/neu"/>
+		<remap from="/rpy" to="/imu/rpy"/>
+	</node>
 
 	<!-- evaluation -->
 	<param name="erase_old_data" type="bool" value="True"/>
-	<param name="/num_sub" type="int" value="2"/>
-	<param name="/method0" type="str" value="Ours"/>
-	<param name="/method1" type="str" value="Gyro"/>
-	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
+	<param name="/num_sub" type="int" value="4"/>
+	<param name="/method0" type="str" value="Gyro+DNN"/>
+	<param name="/method1" type="str" value="DNN"/>
+	<param name="/method2" type="str" value="Gyro"/>
+	<param name="/method3" type="str" value="Gyro+Acc"/>
+	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
 		<remap from="/truth/rpy" to="/gt/rpy"/>
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
-		<remap from="/estimation1/rpy" to="/gyrodometry/rpy"/>
+		<remap from="/estimation1/rpy" to="/dnn/rpy"/>
+		<remap from="/estimation2/rpy" to="/gyrodometry/rpy"/>
+		<remap from="/estimation3/rpy" to="/imu/rpy"/>
 	</node>
 </launch>
