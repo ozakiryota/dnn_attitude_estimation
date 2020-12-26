@@ -4,6 +4,7 @@
 
 	<!-- rosbag -->
 	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/stick_imu4cam/dynamic/dkan_outdoor/20201024_160325.bag"/> -->
+	<!-- <node pkg="rosbag" type="play" name="player" args="&#45;&#45;clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/dynamic/dkan_outdoor/20201027_143715.bag"/> -->
 	<node pkg="rosbag" type="play" name="player" args="--clock /home/amsl/ozaki/bagfiles/stick_vlp32imu4cam/with_vicon/20201213_183636.bag"/>
 
 	<!-- rviz -->
@@ -24,7 +25,7 @@
 		<!-- <param name="sigma_ini" type="double" value="1.0e&#45;10"/> -->
 		<!-- <param name="sigma_gyro" type="double" value="1.0e&#45;4"/> -->
 		<!-- <param name="sigma_acc" type="double" value="2.5e+3"/> -->
-		<!-- <param name="sigma_dnn" type="double" value="5.0e+3"/> -->
+		<param name="sigma_dnn" type="double" value="5.0e+3"/>
 		<!-- <param name="th_mul_sigma" type="double" value="3.1473092356350454e&#45;05"/> -->
 		<param name="th_mul_sigma" type="double" value="1.2e-4"/>
 	</node>

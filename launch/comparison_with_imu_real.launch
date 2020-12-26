@@ -20,22 +20,23 @@
 		<remap from="/odom" to="/gyrodometry"/>
 		<remap from="/rpy" to="/gyrodometry/rpy"/>
 	</node>
-	<node pkg="msg_conversion" type="imu_to_rpy" name="imu_to_rpy">
-		<remap from="/rpy" to="/imu/rpy"/>
-	</node>
+	<!-- <node pkg="msg_conversion" type="imu_to_rpy" name="imu_to_rpy"> -->
+	<!-- 	<remap from="/rpy" to="/imu/rpy"/> -->
+	<!-- </node> -->
 
 	<!-- evaluation -->
 	<param name="erase_old_data" type="bool" value="True"/>
 	<param name="save_csv" type="bool" value="False"/>
-	<param name="/num_sub" type="int" value="4"/>
-	<param name="/method0" type="str" value="Gyro+DNN"/>
+	<param name="interval" type="double" value="0.01"/>
+	<param name="/num_sub" type="int" value="3"/>
+	<param name="/method0" type="str" value="Gyro+DNN(ours)"/>
 	<param name="/method1" type="str" value="DNN"/>
 	<param name="/method2" type="str" value="Gyro"/>
-	<param name="/method3" type="str" value="Gyro+Acc"/>
+	<!-- <param name="/method3" type="str" value="Gyro+Acc"/> -->
 	<node pkg="msg_printer" type="compare_rp.py" name="compare_rp" output="screen">
 		<remap from="/estimation0/rpy" to="/ekf/rpy"/>
 		<remap from="/estimation1/rpy" to="/dnn/rpy"/>
 		<remap from="/estimation2/rpy" to="/gyrodometry/rpy"/>
-		<remap from="/estimation3/rpy" to="/imu/rpy"/>
+		<!-- <remap from="/estimation3/rpy" to="/imu/rpy"/> -->
 	</node>
 </launch>

@@ -33,6 +33,7 @@
 
 	<!-- evaluation -->
 	<param name="erase_old_data" type="bool" value="True"/>
+	<param name="interval" type="double" value="0.01"/>
 	<param name="/num_sub" type="int" value="4"/>
 	<param name="/method0" type="str" value="Gyro+DNN"/>
 	<param name="/method1" type="str" value="DNN"/>
