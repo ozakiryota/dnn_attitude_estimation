@@ -249,7 +249,9 @@ bool DnnAttitudeEstimationEkf::varIsSmallEnough(sensor_msgs::Imu g_msg)
 	_pub_mul_sigma.publish(mul_sigma_msg);
 	if(mul_sigma > _th_mul_sigma){
 		std::cout << "REJECT: mul_sigma = " << mul_sigma << " > " << _th_mul_sigma << std::endl;
-		_pub_vis_text.publish(std::string("REJECTED"));
+		std_msgs::String string_msg;
+		string_msg.data = std::string("REJECTED");
+		_pub_vis_text.publish(string_msg);
 		return false;
 	}
 	std::cout << "mul_sigma = " << mul_sigma << std::endl;
