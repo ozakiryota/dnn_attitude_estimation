@@ -12,30 +12,41 @@ or
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
 ## Usage
 The following commands are just an example.
-### With 1 camera
+### With a camera
 ```bash
 $ roscd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
-$ ./mle_prediction.sh
+$ ./camera_mle_inference.sh
 ```
 Open another terminal.
 ```bash
-$ roslaunch dnn_attitude_estimation airsim_mle_ekf.launch
+$ roslaunch dnn_attitude_estimation camera_mle_ekf_airsim.launch
 ```
 ### With 4 cameras
 ```bash
 $ roscd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
-$ ./combine_mle_prediction.sh
+$ ./combined_cameras_mle_inference.sh
 ```
 Open another terminal.
 ```bash
-$ roslaunch dnn_attitude_estimation real_mle_ekf.launch
+$ roslaunch dnn_attitude_estimation combined_cameras_mle_ekf_real.launch
 ```
-### With 1 camera and 1 LiDAR
+### With a LiDAR
 ```bash
 $ roscd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
-$ ./lidar_camera_regression_prediction.sh
+$ ./lidar_regression_inference.sh
 ```
 Open another terminal.
 ```bash
-$ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_real.launch
+$ roslaunch dnn_attitude_estimation lidar_regression_ekf_real.launch
+
+```
+### With a camera and a LiDAR
+```bash
+$ roscd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
+$ ./lidar_camera_regression_inference.sh
+```
+Open another terminal.
+```bash
+$ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_airsim.launch
+
 ```
