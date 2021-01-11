@@ -80,7 +80,7 @@ class AttitudeEstimation:
         print("outputs = ", outputs)
         ## reset
         self.got_new_depth_img = False
-        print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
+        print("Period [s]: ", rospy.get_time() - start_clock)
         return outputs
 
     def transformImage(self):

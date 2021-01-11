@@ -1,4 +1,3 @@
-from PIL import Image
 import numpy as np
 
 import torch
@@ -6,16 +5,13 @@ from torchvision import models
 import torch.nn as nn
 
 class Network(nn.Module):
-    def __init__(self, resize, dim_fc_out=3, use_pretrained_vgg=True):
+    def __init__(self, dim_fc_out=3):
         super(Network, self).__init__()
-
-        vgg = models.vgg16(pretrained=use_pretrained_vgg)
-        self.color_cnn = vgg.features
 
         conv_kernel_size = (3, 5)
         conv_padding = (1, 2)
         pool_kernel_size = (2, 4)
-        self.depth_cnn = nn.Sequential(
+        self.cnn = nn.Sequential(
             nn.Conv2d(1, 64, kernel_size=conv_kernel_size, stride=1, padding=conv_padding),
             # nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
@@ -30,7 +26,7 @@ class Network(nn.Module):
             nn.MaxPool2d(kernel_size=pool_kernel_size, stride=pool_kernel_size)
         )
 
-        dim_fc_in = 512*(resize//32)*(resize//32) + 256*(32//pool_kernel_size[0]**3)*(1812//pool_kernel_size[1]**3)
+        dim_fc_in = 256*(32//pool_kernel_size[0]**3)*(1812//pool_kernel_size[1]**3)
         self.fc = nn.Sequential(
             nn.Linear(dim_fc_in, 100),
             nn.ReLU(inplace=True),
@@ -41,16 +37,14 @@ class Network(nn.Module):
             nn.Linear(18, dim_fc_out)
         )
 
-    def forward(self, inputs_color, inputs_depth):
-        ## cnn
-        features_color = self.color_cnn(inputs_color)
-        features_depth = self.depth_cnn(inputs_depth)
-        ## concat
-        features_color = torch.flatten(features_color, 1)
-        features_depth = torch.flatten(features_depth, 1)
-        features = torch.cat((features_color, features_depth), dim=1)
-        ## fc
-        outputs = self.fc(features)
-        l2norm = torch.norm(outputs[:, :3].clone(), p=2, dim=1, keepdim=True)
-        outputs[:, :3] = torch.div(outputs[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
-        return outputs
+    def forward(self, x):
+        # print("cnn-in", x.size())
+        x = self.cnn(x)
+        # print("cnn-out", x.size())
+        x = torch.flatten(x, 1)
+        # print("fc-in", x.size())
+        x = self.fc(x)
+        # print("fc-out", x.size())
+        l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
+        x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
+        return x

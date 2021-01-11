@@ -50,7 +50,7 @@ class AttitudeEstimation:
             self.publication(msg.header.stamp)
         except CvBridgeError as e:
             print(e)
-        print("Period [s]: ", rospy.get_time() - start_clock, "Frequency [hz]: ", 1/(rospy.get_time() - start_clock))
+        print("Period [s]: ", rospy.get_time() - start_clock)
 
     def dnnPrediction(self, img_cv):
         img_pil = self.cvToPIL(img_cv)

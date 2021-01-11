@@ -29,7 +29,7 @@
 	<param name="save_csv" type="bool" value="False"/>
 	<param name="interval" type="double" value="0.01"/>
 	<param name="/num_sub" type="int" value="3"/>
-	<param name="/method0" type="str" value="Gyro+DNN(ours)"/>
+	<param name="/method0" type="str" value="Gyro+DNN"/>
 	<param name="/method1" type="str" value="DNN"/>
 	<param name="/method2" type="str" value="Gyro"/>
 	<!-- <param name="/method3" type="str" value="Gyro+Acc"/> -->

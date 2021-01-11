@@ -39,7 +39,7 @@
 	<param name="save_csv" type="bool" value="True"/>
 	<param name="interval" type="double" value="0.01"/>
 	<param name="/num_sub" type="int" value="3"/>
-	<param name="/method0" type="str" value="Gyro+DNN(ours)"/>
+	<param name="/method0" type="str" value="Gyro+DNN"/>
 	<param name="/method1" type="str" value="DNN"/>
 	<param name="/method2" type="str" value="Gyro"/>
 	<node pkg="msg_printer" type="compare_rp_with_gt.py" name="compare_rp_with_gt" output="screen">
