@@ -7,6 +7,8 @@ The deep neural networks are trained by ...
 or
 * [ozakiryota/multi_image_to_gravity](https://github.com/ozakiryota/multi_image_to_gravity)  
 or
+* [ozakiryota/depth_image_to_gravity](https://github.com/ozakiryota/depth_image_to_gravity)  
+or
 * [ozakiryota/color_and_depth_image_to_gravity](https://github.com/ozakiryota/color_and_depth_image_to_gravity)
 ### Dataset
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
