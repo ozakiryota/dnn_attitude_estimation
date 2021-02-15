@@ -127,7 +127,6 @@ class AttitudeEstimation:
     def inputToMsg(self, outputs):
         ## get mean and covariance matrix
         mean = np.array(outputs).mean(0)
-        print("mean.shape = ", mean.shape)
         cov = self.getCovMatrix(outputs)
         ## Vector3Stamped
         self.v_msg.vector.x = -mean[0]
