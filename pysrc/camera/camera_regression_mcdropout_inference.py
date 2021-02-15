@@ -34,6 +34,8 @@ class AttitudeEstimation:
         print("mean_element = ", mean_element)
         std_element = rospy.get_param("/std_element", 0.5)
         print("std_element = ", std_element)
+        self.num_mcsampling = rospy.get_param("/num_mcsampling", 25)
+        print("self.num_mcsampling = ", self.num_mcsampling)
         ## subscriber
         self.sub_color_img = rospy.Subscriber("/color_image", ImageMsg, self.callbackColorImage, queue_size=1, buff_size=2**24)
         ## publisher
@@ -50,6 +52,7 @@ class AttitudeEstimation:
         print("self.device = ", self.device)
         self.img_transform = self.getImageTransform(resize, mean_element, std_element)
         self.net = self.getNetwork(resize, weights_path)
+        self.enable_dropout()
 
     def getImageTransform(self, resize, mean_element, std_element):
         mean = ([mean_element, mean_element, mean_element])
@@ -77,6 +80,11 @@ class AttitudeEstimation:
         net.load_state_dict(loaded_weights)
         return net
 
+    def enable_dropout(self):
+        for module in self.net.modules():
+            if module.__class__.__name__.startswith('Dropout'):
+                module.train()
+
     def callbackColorImage(self, msg):
         try:
             self.color_img_cv = self.bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -97,8 +105,8 @@ class AttitudeEstimation:
         list_outputs = []
         for _ in range(self.num_mcsampling):
             outputs = self.net(inputs_color)
-            list_outputs.append(outputs.cpu().detach().numpy())
-        print("list_outputs = ", list_outputs)
+            list_outputs.append(outputs.cpu().detach().numpy()[0])
+        # print("list_outputs = ", list_outputs)
         ## reset
         print("Period [s]: ", rospy.get_time() - start_clock)
         return list_outputs
@@ -153,7 +161,7 @@ class AttitudeEstimation:
             imu.linear_acceleration_covariance[i] = math.nan
 
     def getCovMatrix(self, outputs):
-        cov = np.cov(outputs[:, 0, :], rowvar=False, bias=True)
+        cov = np.cov(outputs, rowvar=False, bias=True)
         return cov
 
     def publication(self, stamp):
