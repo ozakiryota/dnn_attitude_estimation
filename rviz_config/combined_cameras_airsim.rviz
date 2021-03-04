@@ -25,7 +25,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: camera_f
 Visualization Manager:
   Class: ""
   Displays:
@@ -89,7 +89,7 @@ Visualization Manager:
       Marker Topic: /vis/arrow
       Name: Marker
       Namespaces:
-        {}
+        arrow: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -97,13 +97,13 @@ Visualization Manager:
       Marker Topic: /vis/text
       Name: Marker
       Namespaces:
-        {}
+        text: true
       Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
-    Fixed Frame: imu
+    Fixed Frame: drone
     Frame Rate: 30
   Name: root
   Tools:

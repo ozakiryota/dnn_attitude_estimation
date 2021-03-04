@@ -39,6 +39,9 @@
 	</node>
 
 	<!-- evaluation -->
-	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gyro_real.launch"/>
-	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/> -->
+	<!-- <include file="$(find dnn_attitude_estimation)/launch/comparison_with_imu_real.launch"/> -->
+	<include file="$(find dnn_attitude_estimation)/launch/comparison_with_gt_real.launch"/>
+
+	<!-- visualization -->
+	<include file="$(find dnn_attitude_estimation)/launch/visualize_marker_real.launch"/>
 </launch>
