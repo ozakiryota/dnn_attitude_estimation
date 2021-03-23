@@ -40,6 +40,7 @@ class DnnAttitudeEstimationEkf{
 		bool _wait_inipose;
 		bool _use_quaternion_for_rotation;
 		bool _observe_imu_acc;
+		bool _reject_large_var;
 		std::string _frame_id;
 		double _sigma_ini;
 		double _sigma_gyro;
@@ -78,6 +79,8 @@ DnnAttitudeEstimationEkf::DnnAttitudeEstimationEkf()
 	std::cout << "_use_quaternion_for_rotation = " << (bool)_use_quaternion_for_rotation << std::endl;
 	_nhPrivate.param("observe_imu_acc", _observe_imu_acc, false);
 	std::cout << "_observe_imu_acc = " << (bool)_observe_imu_acc << std::endl;
+	_nhPrivate.param("reject_large_std", _reject_large_var, false);
+	std::cout << "_reject_large_var = " << (bool)_reject_large_var << std::endl;
 	_nhPrivate.param("frame_id", _frame_id, std::string("/base_link"));
 	std::cout << "_frame_id = " << _frame_id << std::endl;
 	_nhPrivate.param("sigma_ini", _sigma_ini, 1.0e-10);
@@ -179,7 +182,7 @@ void DnnAttitudeEstimationEkf::callbackCameraG(const sensor_msgs::ImuConstPtr& m
 	/*wait initial orientation*/
 	if(!_got_inipose)	return;
 	/*judge*/
-	if(varIsSmallEnough(*msg)){
+	if(!_reject_large_var || varIsSmallEnough(*msg)){
 		/*observation*/
 		observationG(*msg, _sigma_dnn);
 		/*publication*/
