@@ -52,3 +52,5 @@ Open another terminal.
 $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_airsim.launch
 
 ```
+## Related repositories
+- [ozakiryota/gyrodometory](https://github.com/ozakiryota/gyrodometry)
