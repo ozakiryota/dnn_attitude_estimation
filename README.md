@@ -55,3 +55,4 @@ $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_airsim.launch
 ## Related repositories
 - [ozakiryota/gyrodometory](https://github.com/ozakiryota/gyrodometry)
 - [ozakiryota/msg_conversion](https://github.com/ozakiryota/msg_conversion)
+- [ozakiryota/msg_printer](https://github.com/ozakiryota/msg_printer)
