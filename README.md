@@ -118,8 +118,10 @@ Preparing ...
 	year = {2021}
 }
 -->
-## Dataset
+## Datasets
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
+## Trained models
+Some trained models are available at [dnn_attitude_estimation/keep](https://github.com/ozakiryota/dnn_attitude_estimation/tree/master/keep).
 ## Related repositories
 - [ozakiryota/gyrodometory](https://github.com/ozakiryota/gyrodometry)
 - [ozakiryota/msg_conversion](https://github.com/ozakiryota/msg_conversion)
