@@ -109,6 +109,15 @@ $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_real.launch
 ```bash
 Preparing ...
 ```
+<!--
+@Inproceedings{ozaki2021,
+	author = {尾崎亮太 and 黒田洋司}, 
+	title = {風景知識を学習するカメラ-LiDAR-DNNによる自己姿勢推定},
+	booktitle = {第26回ロボティクスシンポジア予稿集},
+	pages = {249--250},
+	year = {2021}
+}
+-->
 ## Dataset
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
 ## Related repositories
