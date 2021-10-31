@@ -71,5 +71,12 @@ RUN	cd /home/ros_catkin_ws/src && \
 	git clone https://github.com/ozakiryota/dnn_attitude_estimation &&\
 	cd /home/ros_catkin_ws && \
 	/bin/bash -c "source /opt/ros/noetic/setup.bash; catkin_make"
+# ##### script #####
+# RUN echo "#!/bin/bash \n \
+# 		source /opt/ros/noetic/setup.bash; \n \
+# 		source /home/ros_catkin_ws/devel/setup.bash; \n \
+# 		source /home/catkin_build_ws/install/setup.bash --extend; \n \
+# 		roslaunch dnn_attitude_estimation camera_mle_inference.launch" >> /home/camera_mle_inference.launch.sh &&\
+# 	chmod +x /home/camera_mle_inference.launch.sh
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation
