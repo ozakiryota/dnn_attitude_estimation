@@ -1,6 +1,7 @@
 #!/bin/bash
 
 image_name="dnn_attitude_estimation"
+tag_name="nvidia_docker1_noetic"
 root_path=$(pwd)
 
 xhost +
@@ -11,5 +12,10 @@ nvidia-docker run -it --rm \
 	--net=host \
 	-v $root_path/../../weights:/home/ros_catkin_ws/src/$image_name/weights \
 	-v $root_path/../../pysrc:/home/ros_catkin_ws/src/$image_name/pysrc \
-	$image_name:nvidia_docker1 \
-	/bin/bash /home/mle_prediction.sh
+	--env="OMP_NUM_THREADS=1" \
+	$image_name:$tag_name \
+	bash -c "\
+		source /opt/ros/noetic/setup.bash; \
+		source /home/ros_catkin_ws/devel/setup.bash; \
+		source /home/catkin_build_ws/install/setup.bash --extend; \
+		roslaunch dnn_attitude_estimation camera_regression_mcdropout_inference.launch"

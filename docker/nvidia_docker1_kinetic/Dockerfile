@@ -6,12 +6,13 @@ LABEL com.nvidia.volumes.needed="nvidia_driver"
 ENV PATH /usr/local/nvidia/bin:${PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 ########## BASIS ##########
-RUN apt-get update && apt-get install -y \
-	vim \
-	wget \
-	unzip \
-	git \
-	build-essential
+RUN apt-get update && \
+	apt-get install -y \
+		vim \
+		wget \
+		unzip \
+		git \
+		build-essential
 ########## ROS kinetic insatall ##########
 ## NOTE: "lsb_release" -> "lsb-release"
 RUN apt-get update && \
@@ -31,13 +32,20 @@ RUN mkdir -p /home/ros_catkin_ws/src && \
 	echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc && \
 	echo "source /home/ros_catkin_ws/devel/setup.bash" >> ~/.bashrc && \
 	echo "export ROS_PACKAGE_PATH=\${ROS_PACKAGE_PATH}:/home/ros_catkin_ws" >> ~/.bashrc && \
-	echo "export ROS_WORKSPACE=/home/ros_catkin_ws" >> ~/.bashrc && \
-	echo "function cmk(){\n lastpwd=\$OLDPWD \n cpath=\$(pwd) \n cd /home/ros_catkin_ws \n catkin_make \$@ \n cd \$cpath \n OLDPWD=\$lastpwd \n}" >> ~/.bashrc
+	echo "export ROS_WORKSPACE=/home/ros_catkin_ws" >> ~/.bashrc
+## cmk
+RUN echo "function cmk(){ \n \
+		lastpwd=\$OLDPWD \n \
+		cpath=\$(pwd) \n \
+		cd /home/ros_catkin_ws \n \
+		catkin_make \$@ \n \
+		cd \$cpath \n \
+		OLDPWD=\$lastpwd \n}" >> ~/.bashrc
 ########## PyTorch & Python3 on rospy ##########
 RUN apt-get update && \
 	apt-get install -y \
 		python3-pip && \
-	pip3 install --upgrade pip && \
+	pip3 install --upgrade "pip < 21.0" && \
 	pip3 install \
 		# torch==1.0.0 \
 		# torchvision==0.2.1 \
@@ -94,7 +102,7 @@ RUN	cd /home/ros_catkin_ws/src && \
 # 		source /opt/ros/kinetic/setup.bash; \n \
 # 		source /home/ros_catkin_ws/devel/setup.bash; \n \
 # 		source /home/catkin_build_ws/install/setup.bash --extend; \n \
-# 		roslaunch dnn_attitude_estimation regression_prediction.launch" >> /home/regression_prediction.sh &&\
-# 	chmod +x /home/regression_prediction.sh
+# 		roslaunch dnn_attitude_estimation camera_mle_inference.launch" >> /home/camera_mle_inference.launch.sh &&\
+# 	chmod +x /home/camera_mle_inference.launch.sh
 ######### initial position ##########
 WORKDIR /home/ros_catkin_ws/src/dnn_attitude_estimation

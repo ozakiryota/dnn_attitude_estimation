@@ -1,7 +1,7 @@
 #!/bin/bash
 
 image_name="dnn_attitude_estimation"
-tag_name="nvidia_docker1_kinetic"
+tag_name="nvidia_docker1_noetic"
 root_path=$(pwd)
 
 xhost +
@@ -15,7 +15,7 @@ nvidia-docker run -it --rm \
 	--env="OMP_NUM_THREADS=1" \
 	$image_name:$tag_name \
 	bash -c "\
-		source /opt/ros/kinetic/setup.bash; \
+		source /opt/ros/noetic/setup.bash; \
 		source /home/ros_catkin_ws/devel/setup.bash; \
 		source /home/catkin_build_ws/install/setup.bash --extend; \
-		roslaunch dnn_attitude_estimation lidar_regression_inference.launch"
+		roslaunch dnn_attitude_estimation combined_cameras_regression_inference.launch"
