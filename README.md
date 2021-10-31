@@ -126,3 +126,4 @@ Some trained models are available at [dnn_attitude_estimation/keep](https://gith
 - [ozakiryota/gyrodometory](https://github.com/ozakiryota/gyrodometry)
 - [ozakiryota/msg_conversion](https://github.com/ozakiryota/msg_conversion)
 - [ozakiryota/msg_printer](https://github.com/ozakiryota/msg_printer)
+- [ozakiryota/velodyne_pointcloud_to_depthimage](https://github.com/ozakiryota/velodyne_pointcloud_to_depthimage)
