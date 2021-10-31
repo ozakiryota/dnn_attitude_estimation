@@ -18,7 +18,7 @@ $ catkin_make
 If you can use Docker, follow the commands below.
 ```bash
 $ git clone https://github.com/ozakiryota/dnn_attitude_estimation
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./build.sh
 ```
 ## Usage using 1 camera
@@ -28,14 +28,14 @@ Train the network with [ozakiryota/image_to_gravity](https://github.com/ozakiryo
 ```bash
 $ roslaunch dnn_attitude_estimation camera_mle_inference.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./camera_mle_inference.sh
 ```
 Open another terminal.
 ```bash
 $ roslaunch dnn_attitude_estimation camera_mle_ekf_real.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./run.sh
 $ roslaunch dnn_attitude_estimation camera_mle_ekf_real.launch
 ```
@@ -50,14 +50,14 @@ Train the network with [ozakiryota/multi_image_to_gravity](https://github.com/oz
 ```bash
 $ roslaunch dnn_attitude_estimation combined_cameras_mle_inference.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./combined_cameras_mle_inference.sh
 ```
 Open another terminal.
 ```bash
 $ roslaunch dnn_attitude_estimation combined_cameras_mle_ekf_real.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./run.sh
 $ roslaunch dnn_attitude_estimation combined_cameras_mle_ekf_real.launch
 ```
@@ -72,14 +72,14 @@ Train the network with [ozakiryota/depth_image_to_gravity](https://github.com/oz
 ```bash
 $ roslaunch dnn_attitude_estimation lidar_regression_inference.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./lidar_regression_inference.sh
 ```
 Open another terminal.
 ```bash
 $ roslaunch dnn_attitude_estimation lidar_regression_ekf_real.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./run.sh
 $ roslaunch dnn_attitude_estimation lidar_regression_ekf_real.launch
 ```
@@ -94,14 +94,14 @@ Train the network with [ozakiryota/color_and_depth_image_to_gravity](https://git
 ```bash
 $ roslaunch dnn_attitude_estimation lidar_camera_regression_inference.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./lidar_camera_regression_inference.sh
 ```
 Open another terminal.
 ```bash
 $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_real.launch
 OR
-$ cd dnn_attitude_estimation/docker/nvidia_docker1_noetic
+$ cd dnn_attitude_estimation/docker/nvidia_docker1_kinetic
 $ ./run.sh
 $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_real.launch
 ```
