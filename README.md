@@ -45,7 +45,7 @@ Preparing ...
 ```
 ## Usage using 4 cameras
 ### Train DNN
-Train the network with [ozakiryota/multi_image_to_gravity](https://github.com/ozakiryota/multi_image_to_gravity) .
+Train the network with [ozakiryota/multi_image_to_gravity](https://github.com/ozakiryota/multi_image_to_gravity).
 ### Run
 ```bash
 $ roslaunch dnn_attitude_estimation combined_cameras_mle_inference.launch
