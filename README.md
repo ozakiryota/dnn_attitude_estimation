@@ -40,8 +40,16 @@ $ ./run.sh
 $ roslaunch dnn_attitude_estimation camera_mle_ekf_real.launch
 ```
 ### Citation
-```bash
-Preparing ...
+```TeX
+@ARTICLE{ozaki2021,
+	author = {Ryota Ozaki and Yoji Kuroda},
+	title = {EKF-based real-time self-attitude estimation with camera DNN learning landscape regularities},
+	journal = {IEEE Robotics and Automation Letters (RA-L)},
+	volume = {6},
+	number = {2},
+	pages = {1737--1744},
+	year = {2021}
+}
 ```
 ## Usage using 4 cameras
 ### Train DNN
@@ -62,7 +70,7 @@ $ ./run.sh
 $ roslaunch dnn_attitude_estimation combined_cameras_mle_ekf_real.launch
 ```
 ### Citation
-```bash
+```TeX
 Preparing ...
 ```
 ## Usage using LiDAR
@@ -84,8 +92,16 @@ $ ./run.sh
 $ roslaunch dnn_attitude_estimation lidar_regression_ekf_real.launch
 ```
 ### Citation
-```bash
-Preparing ...
+```TeX
+@ARTICLE{ozaki2021,
+	author = {Ryota Ozaki and Naoya Sugiura and Yoji Kuroda},
+	title = {LiDAR DNN based self-attitude estimation with learning landscape regularities},
+	journal = {ROBOMECH Journal},
+	volume = {8},
+	number = {26},
+	pages = {10.1186/s40648-021-00213-5},
+	year = {2021}
+}
 ```
 ## Usage using 1 camera and LiDAR
 ### Train DNN
@@ -106,10 +122,7 @@ $ ./run.sh
 $ roslaunch dnn_attitude_estimation lidar_camera_regression_ekf_real.launch
 ```
 ### Citation
-```bash
-Preparing ...
-```
-<!--
+```TeX
 @Inproceedings{ozaki2021,
 	author = {尾崎亮太 and 黒田洋司}, 
 	title = {風景知識を学習するカメラ-LiDAR-DNNによる自己姿勢推定},
@@ -117,7 +130,7 @@ Preparing ...
 	pages = {249--250},
 	year = {2021}
 }
--->
+```
 ## Datasets
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
 ## Trained models
